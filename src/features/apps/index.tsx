@@ -62,7 +62,7 @@ export default function Apps() {
       <Main fixed>
         <div>
           <h1 className='text-2xl font-bold tracking-tight'>
-            App Integrations
+            Suite Apps
           </h1>
           <p className='text-muted-foreground'>
             Here&apos;s a list of your apps for the integration!

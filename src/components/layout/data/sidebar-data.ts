@@ -25,25 +25,25 @@ import { type SidebarData } from '../types'
 
 export const sidebarData: SidebarData = {
   user: {
-    name: 'satnaing',
-    email: 'satnaingdev@gmail.com',
+    name: 'ncliam',
+    email: 'ncliam@gmail.com',
     avatar: '/avatars/shadcn.jpg',
   },
   teams: [
     {
-      name: 'Shadcn Admin',
+      name: 'CPC1',
       logo: Command,
-      plan: 'Vite + ShadcnUI',
+      plan: 'TMS + WMS',
     },
     {
-      name: 'Acme Inc',
+      name: 'Freshfood',
       logo: GalleryVerticalEnd,
-      plan: 'Enterprise',
+      plan: 'WMS',
     },
     {
-      name: 'Acme Corp.',
+      name: 'Ladophar',
       logo: AudioWaveform,
-      plan: 'Startup',
+      plan: 'DMS',
     },
   ],
   navGroups: [
@@ -54,11 +54,6 @@ export const sidebarData: SidebarData = {
           title: 'Dashboard',
           url: '/',
           icon: IconLayoutDashboard,
-        },
-        {
-          title: 'Tasks',
-          url: '/tasks',
-          icon: IconChecklist,
         },
         {
           title: 'Apps',
@@ -77,22 +72,9 @@ export const sidebarData: SidebarData = {
           icon: IconUsers,
         },
         {
-          title: 'Secured by Clerk',
-          icon: ClerkLogo,
-          items: [
-            {
-              title: 'Sign In',
-              url: '/clerk/sign-in',
-            },
-            {
-              title: 'Sign Up',
-              url: '/clerk/sign-up',
-            },
-            {
-              title: 'User Management',
-              url: '/clerk/user-management',
-            },
-          ],
+          title: 'Tasks',
+          url: '/tasks',
+          icon: IconChecklist,
         },
       ],
     },
