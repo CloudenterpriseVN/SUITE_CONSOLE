@@ -1,4 +1,5 @@
-import { Link } from '@tanstack/react-router'
+import { Link, useNavigate } from '@tanstack/react-router'
+import { useAuthStore } from '@/stores/authStore'
 import {
   BadgeCheck,
   Bell,
@@ -24,16 +25,14 @@ import {
   useSidebar,
 } from '@/components/ui/sidebar'
 
-export function NavUser({
-  user,
-}: {
-  user: {
-    name: string
-    email: string
-    avatar: string
-  }
-}) {
+export function NavUser() {
   const { isMobile } = useSidebar()
+  const navigate = useNavigate()
+  const { auth } = useAuthStore()
+  const user = auth.user
+  const signOut = auth.signOut
+
+  if (!user) return null;
 
   return (
     <SidebarMenu>
@@ -46,11 +45,13 @@ export function NavUser({
             >
               <Avatar className='h-8 w-8 rounded-lg'>
                 <AvatarImage src={user.avatar} alt={user.name} />
-                <AvatarFallback className='rounded-lg'>SN</AvatarFallback>
+                <AvatarFallback className='rounded-lg'>
+                  {user.name?.charAt(0) || user.email?.charAt(0) || 'U'}
+                </AvatarFallback>
               </Avatar>
               <div className='grid flex-1 text-left text-sm leading-tight'>
-                <span className='truncate font-semibold'>{user.name}</span>
-                <span className='truncate text-xs'>{user.email}</span>
+                <span className='truncate font-semibold'>{user.name || user.email}</span>
+                <span className='truncate text-xs'>{user.accountNo}</span>
               </div>
               <ChevronsUpDown className='ml-auto size-4' />
             </SidebarMenuButton>
@@ -65,11 +66,13 @@ export function NavUser({
               <div className='flex items-center gap-2 px-1 py-1.5 text-left text-sm'>
                 <Avatar className='h-8 w-8 rounded-lg'>
                   <AvatarImage src={user.avatar} alt={user.name} />
-                  <AvatarFallback className='rounded-lg'>SN</AvatarFallback>
+                  <AvatarFallback className='rounded-lg'>
+                    {user.name?.charAt(0) || user.email?.charAt(0) || 'U'}
+                  </AvatarFallback>
                 </Avatar>
                 <div className='grid flex-1 text-left text-sm leading-tight'>
-                  <span className='truncate font-semibold'>{user.name}</span>
-                  <span className='truncate text-xs'>{user.email}</span>
+                  <span className='truncate font-semibold'>{user.name || user.email}</span>
+                  <span className='truncate text-xs'>{user.accountNo}</span>
                 </div>
               </div>
             </DropdownMenuLabel>
@@ -102,7 +105,18 @@ export function NavUser({
               </DropdownMenuItem>
             </DropdownMenuGroup>
             <DropdownMenuSeparator />
-            <DropdownMenuItem>
+            <DropdownMenuItem
+              onClick={async () => {
+                try {
+                  if (signOut) await signOut()
+                } catch (err) {
+                  // eslint-disable-next-line no-console
+                  console.error('Sign out failed', err)
+                } finally {
+                  navigate({ to: '/sign-in-2' })
+                }
+              }}
+            >
               <LogOut />
               Log out
             </DropdownMenuItem>

@@ -23,4 +23,7 @@ export default defineConfig({
       '@tabler/icons-react': '@tabler/icons-react/dist/esm/icons/index.mjs',
     },
   },
+  server: {
+    allowedHosts: ['localhost', '127.0.0.1','glasgow-searching-ago-scoop.trycloudflare.com'],
+  },
 })
