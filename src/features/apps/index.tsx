@@ -19,7 +19,8 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { apps } from './data/apps'
+import { appsState } from '@/stores/applicationStore'
+import { useAtomValue } from 'jotai'
 
 const appText = new Map<string, string>([
   ['all', 'All Apps'],
@@ -28,6 +29,7 @@ const appText = new Map<string, string>([
 ])
 
 export default function Apps() {
+  const apps = useAtomValue(appsState)
   const [sort, setSort] = useState('ascending')
   const [appType, setAppType] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
@@ -119,9 +121,9 @@ export default function Apps() {
             >
               <div className='mb-8 flex items-center justify-between'>
                 <div
-                  className={`bg-muted flex size-10 items-center justify-center rounded-lg p-2`}
+                  className={`bg-muted flex size-32 items-center justify-center rounded-lg p-2`}
                 >
-                  {app.logo}
+                  <img src={app.logo} alt={app.name} />
                 </div>
                 <Button
                   variant='outline'

@@ -58,7 +58,7 @@ export const signInWithGoogle = async (
 
   // Save to localStorage and Cookies
   localStorage.setItem('auth_user', JSON.stringify(authUser))
-  Cookies.set(ACCESS_TOKEN, JSON.stringify(token))
+  Cookies.set(ACCESS_TOKEN, token)
 
   // Update atoms
   setUser(authUser)
