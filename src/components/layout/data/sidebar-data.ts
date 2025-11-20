@@ -27,14 +27,14 @@ export const sidebarData: SidebarData = {
     {
       title: 'General',
       items: [
-        {
-          title: 'Dashboard',
-          url: '/',
-          icon: IconLayoutDashboard,
-        },
+        // {
+        //   title: 'Dashboard',
+        //   url: '/',
+        //   icon: IconLayoutDashboard,
+        // },
         {
           title: 'Apps',
-          url: '/apps',
+          url: '/',
           icon: IconPackages,
         },
         // {
@@ -48,11 +48,11 @@ export const sidebarData: SidebarData = {
         //   url: '/users',
         //   icon: IconUsers,
         // },
-        // {
-        //   title: 'Tasks',
-        //   url: '/tasks',
-        //   icon: IconChecklist,
-        // },
+        {
+          title: 'Billing',
+          url: '/tasks',
+          icon: IconChecklist,
+        },
       ],
     },
     // {
