@@ -1,0 +1,42 @@
+[
+    {
+        "name": "Warehouse Management System",
+        "code": "com.cev.wms",
+        "desc": "Mobility solution for Inventory",
+        "logo": "https://d3jbu7vaxvlagf.cloudfront.net/small/v2/category_media/logo_template_img_16673896175814.png",
+        "create_at": null,
+        "updated_at": null,
+        "id": "0hh6T3P8lNzCwrw4RIiB",
+        "key": "apps/0hh6T3P8lNzCwrw4RIiB"
+    },
+    {
+        "name": "Algriculture Management System",
+        "code": null,
+        "desc": "Modern farming technology",
+        "logo": "https://static.vecteezy.com/system/resources/previews/006/547/528/non_2x/smart-farm-logo-design-agriculture-logo-for-all-business-free-vector.jpg",
+        "create_at": null,
+        "updated_at": null,
+        "id": "2d9PDsMGWurVrbxnb8z8",
+        "key": "apps/2d9PDsMGWurVrbxnb8z8"
+    },
+    {
+        "name": "Advanced Planning System",
+        "code": "com.cev.aps",
+        "desc": "Planning and Scheduling",
+        "logo": "https://cdn-icons-png.flaticon.com/512/4319/4319308.png",
+        "create_at": null,
+        "updated_at": null,
+        "id": "AEHZDPfxtHnOEgYw3Qjx",
+        "key": "apps/AEHZDPfxtHnOEgYw3Qjx"
+    },
+    {
+        "name": "Transportation Management System",
+        "code": "com.cev.tms",
+        "desc": "Logistics",
+        "logo": "https://media.istockphoto.com/id/1313843101/vector/blue-logistics-logo-with-lines-highway-vector.jpg?s=612x612&w=0&k=20&c=8mueJQSnrwO6Mr-oRp12v3drokq1RJJZj6PWvmFjmWY=",
+        "create_at": null,
+        "updated_at": null,
+        "id": "c8q6GMAEdnj4k6EaJWSr",
+        "key": "apps/c8q6GMAEdnj4k6EaJWSr"
+    }
+]

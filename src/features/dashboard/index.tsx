@@ -17,9 +17,12 @@ import { Overview } from './components/overview'
 import { RecentSales } from './components/recent-sales'
 import { useAtomValue } from 'jotai'
 import { activeAppState } from '@/stores/applicationStore'
+import { useNavigate } from '@tanstack/react-router'
 
 export default function Dashboard() {
-  const activeApp = useAtomValue(activeAppState)
+  const activeApp = useAtomValue(activeAppState);
+  const navigate = useNavigate()
+  if (!activeApp) navigate({ to: '/apps' })
   return (
     <>
       {/* ===== Top Heading ===== */}
@@ -196,26 +199,20 @@ export default function Dashboard() {
 const topNav = [
   {
     title: 'Overview',
-    href: 'dashboard/overview',
+    href: '/overview',
     isActive: true,
     disabled: false,
   },
   {
-    title: 'Customers',
-    href: 'dashboard/customers',
-    isActive: false,
-    disabled: true,
-  },
-  {
-    title: 'Products',
-    href: 'dashboard/products',
-    isActive: false,
-    disabled: true,
+    title: 'Users',
+    href: '/users',
+    isActive: true,
+    disabled: false,
   },
   {
     title: 'Settings',
-    href: 'dashboard/settings',
-    isActive: false,
-    disabled: true,
+    href: '/settings',
+    isActive: true,
+    disabled: false,
   },
 ]
