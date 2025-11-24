@@ -10,7 +10,6 @@ import { UsersTable } from './components/users-table'
 import UsersProvider from './context/users-context'
 import { userListSchema } from './data/schema'
 import { users } from './data/users'
-import { TopNav } from '@/components/layout/top-nav'
 
 export default function Users() {
   // Parse user list
@@ -18,15 +17,6 @@ export default function Users() {
 
   return (
     <UsersProvider>
-      <Header>
-        <TopNav />
-        <div className='ml-auto flex items-center space-x-4'>
-          <Search />
-          <ThemeSwitch />
-          <ProfileDropdown />
-        </div>
-      </Header>
-
       <Main>
         <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
           <div>

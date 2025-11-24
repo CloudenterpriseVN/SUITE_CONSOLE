@@ -11,7 +11,7 @@
     },
     {
         "name": "Algriculture Management System",
-        "code": null,
+        "code": "com.cev.ams",
         "desc": "Modern farming technology",
         "logo": "https://static.vecteezy.com/system/resources/previews/006/547/528/non_2x/smart-farm-logo-design-agriculture-logo-for-all-business-free-vector.jpg",
         "create_at": null,

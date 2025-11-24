@@ -19,7 +19,7 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { appsState, activeAppState } from '@/stores/applicationStore'
+import { appsState, savedAppState } from '@/stores/applicationStore'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useNavigate } from '@tanstack/react-router'
 
@@ -31,7 +31,7 @@ const appText = new Map<string, string>([
 
 export default function Apps() {
   const apps = useAtomValue(appsState)
-  const setActiveApp = useSetAtom(activeAppState)
+  const setActiveApp = useSetAtom(savedAppState)
   const navigate = useNavigate()
   const [sort, setSort] = useState('ascending')
   const [appType, setAppType] = useState('all')
@@ -134,7 +134,7 @@ export default function Apps() {
                   className={`${app.connected ? 'border border-blue-300 bg-blue-50 hover:bg-blue-100 dark:border-blue-700 dark:bg-blue-950 dark:hover:bg-blue-900' : ''}`}
                   onClick={() => {
                     // set active app in global store and navigate to dashboard
-                    setActiveApp(app)
+                    setActiveApp(app.code)
                     navigate({ to: '/dashboard' })
                   }}
                 >

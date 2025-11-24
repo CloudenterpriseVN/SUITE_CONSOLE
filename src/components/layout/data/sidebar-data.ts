@@ -27,31 +27,31 @@ export const sidebarData: SidebarData = {
     {
       title: 'General',
       items: [
-        // {
-        //   title: 'Dashboard',
-        //   url: '/',
-        //   icon: IconLayoutDashboard,
-        // },
+        
         {
           title: 'Apps',
           url: '/',
           icon: IconPackages,
         },
-        // {
-        //   title: 'Chats',
-        //   url: '/chats',
-        //   badge: '3',
-        //   icon: IconMessages,
-        // },
-        // {
-        //   title: 'Users',
-        //   url: '/users',
-        //   icon: IconUsers,
-        // },
         {
           title: 'Billing',
           url: '/tasks',
           icon: IconChecklist,
+        },
+      ],
+    },
+    {
+      title: 'Application',
+      items: [
+        {
+          title: 'Dashboard',
+          url: '/dashboard',
+          icon: IconLayoutDashboard,
+        },
+        {
+          title: 'Settings',
+          url: '/settings',
+          icon: IconUserCog,
         },
       ],
     },
@@ -120,37 +120,6 @@ export const sidebarData: SidebarData = {
     {
       title: 'Other',
       items: [
-        {
-          title: 'Settings',
-          icon: IconSettings,
-          items: [
-            {
-              title: 'Profile',
-              url: '/settings',
-              icon: IconUserCog,
-            },
-            {
-              title: 'Account',
-              url: '/settings/account',
-              icon: IconTool,
-            },
-            {
-              title: 'Appearance',
-              url: '/settings/appearance',
-              icon: IconPalette,
-            },
-            {
-              title: 'Notifications',
-              url: '/settings/notifications',
-              icon: IconNotification,
-            },
-            {
-              title: 'Display',
-              url: '/settings/display',
-              icon: IconBrowserCheck,
-            },
-          ],
-        },
         {
           title: 'Help Center',
           url: '/help-center',
