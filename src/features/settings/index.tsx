@@ -60,11 +60,11 @@ const sidebarNavItems = [
   {
     title: 'API Keys',
     icon: <IconTool size={18} />,
-    href: '/settings/account',
+    href: '/settings/apikeys',
   },
   {
     title: 'Webhooks',
     icon: <IconPalette size={18} />,
-    href: '/settings/appearance',
+    href: '/settings/webhooks',
   },
 ]
