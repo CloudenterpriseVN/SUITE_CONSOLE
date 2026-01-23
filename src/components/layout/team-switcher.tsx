@@ -33,7 +33,8 @@ export function TeamSwitcher() {
   const [editingTeam, setEditingTeam] = useState<Team | null>(null)
 
   // Chỉ lấy các team đã được phê duyệt để switch
-  const verifiedTeams = teams.filter((team: Team) => team.verified)
+  const teamArray = Array.isArray(teams) ? teams : []
+  const verifiedTeams = teamArray.filter((team: Team) => team.verified)
   const activeTeam = verifiedTeams.find((t: Team) => t.id === activeTeamId) ?? verifiedTeams[0]
 
   const handleAddTeam = () => {
@@ -50,7 +51,7 @@ export function TeamSwitcher() {
   const handleSaveTeam = (teamData: Partial<Team>) => {
     if (editingTeam) {
       // Edit mode
-      const updatedTeams = teams.map((t: Team) =>
+      const updatedTeams = teamArray.map((t: Team) =>
         t.id === editingTeam.id
           ? { ...t, ...teamData, updatedAt: new Date().toISOString() }
           : t
@@ -71,7 +72,7 @@ export function TeamSwitcher() {
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       }
-      setLocalTeams([...teams, newTeam])
+      setLocalTeams([...teamArray, newTeam])
       setModifiedTeamIds(new Set([...modifiedTeamIds, newTeam.id]))
       toast.success('Đã tạo team mới. Team cần được phê duyệt trước khi sử dụng.')
     }
@@ -116,7 +117,7 @@ export function TeamSwitcher() {
               <DropdownMenuLabel className='text-muted-foreground text-xs'>
                 Teams
               </DropdownMenuLabel>
-              {teams.map((team: Team, index: number) => (
+              {teamArray.map((team: Team, index: number) => (
                 <DropdownMenuItem
                   key={team.id}
                   onClick={() => handleSwitchTeam(team)}

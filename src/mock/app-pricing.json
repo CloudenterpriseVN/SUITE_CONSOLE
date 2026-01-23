@@ -16,17 +16,15 @@
   },
   {
     "appCode": "com.cev.ams",
-    "appName": "AMS - Asset Management",
-    "description": "Quản lý tài sản doanh nghiệp",
+    "appName": "AMS - Agriculture Management System",
+    "description": "Quản lý sản xuất nông nghiệp",
     "pricing": {
       "monthly": 800000,
       "yearly": 8640000
     },
     "features": [
-      "Quản lý tài sản cố định",
-      "Theo dõi khấu hao",
-      "Lịch sử bảo trì",
-      "Báo cáo tài sản"
+      "Quản lý trồng trọt chăn nuôi",
+      "Kế hoạch thu gom NVL"
     ]
   },
   {
@@ -57,6 +55,32 @@
       "Tối ưu công suất",
       "Dự báo nhu cầu",
       "Phân tích bottleneck"
+    ]
+  },
+  {
+    "appCode": "com.cev.pos",
+    "appName": "POS - Point of Sale",
+    "description": "Máy bán hàng",
+    "pricing": {
+      "monthly": 2000000,
+      "yearly": 21600000
+    },
+    "features": [
+      "Bán hàng tại quầy",
+      "Thanh toán QR"
+    ]
+  },
+  {
+    "appCode": "com.cev.dms",
+    "appName": "DMS - Distribution Management System",
+    "description": "Kênh bán hàng phân phối",
+    "pricing": {
+      "monthly": 2000000,
+      "yearly": 21600000
+    },
+    "features": [
+      "Lên đơn bằng ứng dụng di động",
+      "Kiểm tra tình hình đại lý"
     ]
   }
 ]

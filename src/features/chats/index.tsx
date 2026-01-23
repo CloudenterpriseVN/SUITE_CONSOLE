@@ -24,6 +24,7 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { AppSelector } from '@/components/app-selector'
 import { NewChat } from './components/new-chat'
 import { type ChatUser, type Convo } from './data/chat-types'
 // Fake Data
@@ -68,6 +69,7 @@ export default function Chats() {
       <Header>
         <Search />
         <div className='ml-auto flex items-center space-x-4'>
+          <AppSelector />
           <ThemeSwitch />
           <ProfileDropdown />
         </div>

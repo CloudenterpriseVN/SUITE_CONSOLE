@@ -38,5 +38,25 @@
         "updated_at": null,
         "id": "c8q6GMAEdnj4k6EaJWSr",
         "key": "apps/c8q6GMAEdnj4k6EaJWSr"
+    },
+    {
+        "name": "Point of Sale",
+        "code": "com.cev.pos",
+        "desc": "Retail",
+        "logo": "https://media.istockphoto.com/id/1313843101/vector/blue-logistics-logo-with-lines-highway-vector.jpg?s=612x612&w=0&k=20&c=8mueJQSnrwO6Mr-oRp12v3drokq1RJJZj6PWvmFjmWY=",
+        "create_at": null,
+        "updated_at": null,
+        "id": "c8q6GMAEdnj4k6EaJRRR",
+        "key": "apps/c8q6GMAEdnj4k6EaJRRR"
+    },
+    {
+        "name": "Distribution Management System",
+        "code": "com.cev.dms",
+        "desc": "Wholesale",
+        "logo": "https://media.istockphoto.com/id/1313843101/vector/blue-logistics-logo-with-lines-highway-vector.jpg?s=612x612&w=0&k=20&c=8mueJQSnrwO6Mr-oRp12v3drokq1RJJZj6PWvmFjmWY=",
+        "create_at": null,
+        "updated_at": null,
+        "id": "TTTTGMAEdnj4k6EaJRRR",
+        "key": "apps/TTTTGMAEdnj4k6EaJRRR"
     }
 ]

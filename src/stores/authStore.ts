@@ -29,7 +29,7 @@ const getInitialUser = (): AuthUser | null => {
 const getInitialToken = (): string => {
   try {
     const stored = Cookies.get(ACCESS_TOKEN)
-    return stored ? JSON.parse(stored) : ''
+    return stored || ''
   } catch {
     return ''
   }
@@ -60,6 +60,14 @@ export const signInWithGoogle = async (
   // Save to localStorage and Cookies
   localStorage.setItem('auth_user', JSON.stringify(authUser))
   Cookies.set(ACCESS_TOKEN, token)
+
+  // Debug: Log token info
+  if (import.meta.env.DEV) {
+    // eslint-disable-next-line no-console
+    console.log('[Auth] Token saved to cookie, length:', token.length)
+    // eslint-disable-next-line no-console
+    console.log('[Auth] Token preview:', token.substring(0, 50) + '...')
+  }
 
   // Update atoms
   setUser(authUser)

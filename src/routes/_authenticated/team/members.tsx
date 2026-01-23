@@ -2,7 +2,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useState } from 'react'
 import { MemberList } from '@/features/team/components/member-list'
 import { InviteMemberDialog } from '@/features/team/components/invite-member-dialog'
-import { TeamSelector } from '@/components/team-selector'
+import { AppSelector } from '@/components/app-selector'
 import { useActiveTeam } from '@/hooks/use-team'
 import { Button } from '@/components/ui/button'
 import { UserPlus, AlertCircle } from 'lucide-react'
@@ -25,7 +25,7 @@ function TeamMembersPage() {
             <UserPlus className="h-4 w-4 mr-2" />
             Mời thành viên
           </Button>
-          <TeamSelector />
+          <AppSelector />
         </div>
       </div>
 

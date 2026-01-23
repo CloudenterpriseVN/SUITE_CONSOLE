@@ -2,8 +2,11 @@ import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { IconMailPlus, IconSend } from '@tabler/icons-react'
-import { showSubmittedData } from '@/utils/show-submitted-data'
 import { Button } from '@/components/ui/button'
+import { useInviteTeamMember } from '@/hooks/use-team'
+import { useQueryClient } from '@tanstack/react-query'
+import { toast } from 'sonner'
+import { useState } from 'react'
 import {
   Dialog,
   DialogClose,
@@ -22,7 +25,6 @@ import {
   FormMessage,
 } from '@/components/ui/form'
 import { Input } from '@/components/ui/input'
-import { Textarea } from '@/components/ui/textarea'
 import { SelectDropdown } from '@/components/select-dropdown'
 import { userTypes } from '../data/data'
 
@@ -46,31 +48,49 @@ export function UsersInviteDialog({ open, onOpenChange }: Props) {
     resolver: zodResolver(formSchema),
     defaultValues: { email: '', role: '', desc: '' },
   })
+  const { inviteMember } = useInviteTeamMember()
+  const queryClient = useQueryClient()
+  const [isInviting, setIsInviting] = useState(false)
 
-  const onSubmit = (values: UserInviteForm) => {
+  const onSubmit = async (values: UserInviteForm) => {
+    setIsInviting(true)
+    try {
+      await inviteMember(values.email, values.role)
+
+      // Invalidate queries to refresh member list
+      queryClient.invalidateQueries({ queryKey: ['team-members'] })
+
+      toast.success(`Invitation sent to ${values.email}`, {
+        description: 'They can accept it from their Invitations page',
+      })
+
+      handleClose()
+    } catch (error: any) {
+      toast.error('Failed to invite member', {
+        description: error.message || 'An error occurred',
+      })
+    } finally {
+      setIsInviting(false)
+    }
+  }
+
+  const handleClose = () => {
     form.reset()
-    showSubmittedData(values)
     onOpenChange(false)
   }
 
   return (
-    <Dialog
-      open={open}
-      onOpenChange={(state) => {
-        form.reset()
-        onOpenChange(state)
-      }}
-    >
+    <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className='sm:max-w-md'>
         <DialogHeader className='text-left'>
           <DialogTitle className='flex items-center gap-2'>
             <IconMailPlus /> Invite User
           </DialogTitle>
           <DialogDescription>
-            Invite new user to join your team by sending them an email
-            invitation. Assign a role to define their access level.
+            Invite new user to join your team. They can accept the invitation from their Invitations page.
           </DialogDescription>
         </DialogHeader>
+
         <Form {...form}>
           <form
             id='user-invite-form'
@@ -113,31 +133,14 @@ export function UsersInviteDialog({ open, onOpenChange }: Props) {
                 </FormItem>
               )}
             />
-            <FormField
-              control={form.control}
-              name='desc'
-              render={({ field }) => (
-                <FormItem className=''>
-                  <FormLabel>Description (optional)</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      className='resize-none'
-                      placeholder='Add a personal note to your invitation (optional)'
-                      {...field}
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
           </form>
         </Form>
         <DialogFooter className='gap-y-2'>
           <DialogClose asChild>
             <Button variant='outline'>Cancel</Button>
           </DialogClose>
-          <Button type='submit' form='user-invite-form'>
-            Invite <IconSend />
+          <Button type='submit' form='user-invite-form' disabled={isInviting}>
+            {isInviting ? 'Inviting...' : 'Invite'} <IconSend />
           </Button>
         </DialogFooter>
       </DialogContent>

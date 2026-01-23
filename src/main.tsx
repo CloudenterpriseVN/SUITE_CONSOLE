@@ -1,6 +1,5 @@
 import { StrictMode } from 'react'
 import ReactDOM from 'react-dom/client'
-import { AxiosError } from 'axios'
 import {
   QueryCache,
   QueryClient,
@@ -8,7 +7,6 @@ import {
 } from '@tanstack/react-query'
 import { RouterProvider, createRouter } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { resetAuthState } from '@/stores/authStore'
 import { handleServerError } from '@/utils/handle-server-error'
 import { FontProvider } from './context/font-context'
 import { ThemeProvider } from './context/theme-context'
@@ -26,10 +24,8 @@ const queryClient = new QueryClient({
         if (failureCount >= 0 && import.meta.env.DEV) return false
         if (failureCount > 3 && import.meta.env.PROD) return false
 
-        return !(
-          error instanceof AxiosError &&
-          [401, 403].includes(error.response?.status ?? 0)
-        )
+        // Don't retry on 401/403 errors
+        return !(error instanceof Error && (error.message === 'Unauthorized' || error.message.includes('403')))
       },
       refetchOnWindowFocus: import.meta.env.PROD,
       staleTime: 10 * 1000, // 10s
@@ -37,31 +33,22 @@ const queryClient = new QueryClient({
     mutations: {
       onError: (error) => {
         handleServerError(error)
-
-        if (error instanceof AxiosError) {
-          if (error.response?.status === 304) {
-            toast.error('Content not modified!')
-          }
-        }
       },
     },
   },
   queryCache: new QueryCache({
     onError: (error) => {
-      if (error instanceof AxiosError) {
-        if (error.response?.status === 401) {
-          toast.error('Session expired!')
-          resetAuthState()
-          const redirect = `${router.history.location.href}`
-          router.navigate({ to: '/sign-in', search: { redirect } })
-        }
-        if (error.response?.status === 500) {
-          toast.error('Internal Server Error!')
-          router.navigate({ to: '/500' })
-        }
-        if (error.response?.status === 403) {
-          // router.navigate("/forbidden", { replace: true });
-        }
+      // Handle 401 Unauthorized errors from fetch-based requests
+      if (error instanceof Error && error.message === 'Unauthorized') {
+        toast.error('Session expired!')
+        const redirect = `${router.history.location.href}`
+        router.navigate({ to: '/sign-in-2', search: { redirect } })
+      }
+
+      // Handle 500 errors
+      if (error instanceof Error && error.message.includes('HTTP 500')) {
+        toast.error('Internal Server Error!')
+        router.navigate({ to: '/500' })
       }
     },
   }),

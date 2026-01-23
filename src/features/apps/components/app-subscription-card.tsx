@@ -5,24 +5,28 @@ import { useAppSubscriptionStatus } from '@/hooks/use-app-subscription'
 import { useAppPricing } from '@/hooks/use-app-subscription'
 import { useActiveTeam } from '@/hooks/use-team'
 import { usePermission } from '@/hooks/use-permission'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface AppSubscriptionCardProps {
+  appId: string
   appCode: string
   appName: string
   onSubscribe: () => void
   onAccess: () => void
+  isSubscribing?: boolean
 }
 
 export function AppSubscriptionCard({
+  appId,
   appCode,
   appName,
   onSubscribe,
   onAccess,
+  isSubscribing = false,
 }: AppSubscriptionCardProps) {
   const { data: pricingList } = useAppPricing()
-  const { isSubscribed, subscription } = useAppSubscriptionStatus(appCode)
+  const { isSubscribed, subscription } = useAppSubscriptionStatus(appId)
   const { data: activeTeam } = useActiveTeam()
   const { can, isTeamVerified } = usePermission()
 
@@ -41,11 +45,7 @@ export function AppSubscriptionCard({
       return
     }
 
-    if (!can('subscribe:apps')) {
-      toast.error('Bạn không có quyền đăng ký app')
-      return
-    }
-
+    // Permission check will be done on server side
     onSubscribe()
   }
 
@@ -88,24 +88,36 @@ export function AppSubscriptionCard({
 
         {isSubscribed && subscription ? (
           <div className="space-y-2">
-            <Badge variant={subscription.status === 'active' ? 'default' : 'secondary'}>
-              {subscription.status === 'active' ? 'Đã đăng ký' : 'Dùng thử'}
+            <Badge variant={subscription.status === 'active' ? 'default' : subscription.status === 'registered' ? 'secondary' : 'destructive'}>
+              {subscription.status === 'registered' && 'Đã đăng ký'}
+              {subscription.status === 'active' && 'Đang hoạt động'}
+              {subscription.status === 'suspended' && 'Đã tạm dừng'}
             </Badge>
-            <p className="text-sm text-muted-foreground">
-              Chu kỳ thanh toán kết thúc:{' '}
-              {new Date(subscription.currentPeriodEnd).toLocaleDateString('vi-VN')}
-            </p>
-            <Button className="w-full" onClick={onAccess}>
-              Truy cập
-            </Button>
+            {subscription.updated_at && (
+              <p className="text-sm text-muted-foreground">
+                Cập nhật lúc: {subscription.updated_at}
+              </p>
+            )}
+            {subscription.status === 'active' && (
+              <Button variant="outline" className="w-full" onClick={onAccess}>
+                Truy cập
+              </Button>
+            )}
           </div>
         ) : (
           <Button
             className="w-full"
             onClick={handleSubscribe}
-            disabled={!isTeamVerified || !activeTeam}
+            disabled={!isTeamVerified || !activeTeam || isSubscribing}
           >
-            Đăng ký ngay
+            {isSubscribing ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Đang đăng ký...
+              </>
+            ) : (
+              'Đăng ký ngay'
+            )}
           </Button>
         )}
       </CardContent>

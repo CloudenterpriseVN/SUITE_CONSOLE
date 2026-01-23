@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   IconAdjustmentsHorizontal,
   IconSortAscendingLetters,
@@ -18,14 +18,15 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
-import { TeamSelector } from '@/components/team-selector'
+import { AppSelector } from '@/components/app-selector'
 import { AppSubscriptionCard } from './components/app-subscription-card'
 import { appsState, savedAppState } from '@/stores/applicationStore'
 import { useActiveTeam } from '@/hooks/use-team'
+import { useCreateSubscription } from '@/hooks/use-app-subscription'
 import { useAtomValue, useSetAtom } from 'jotai'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
-import { AlertCircle } from 'lucide-react'
+import { AlertCircle, Loader2 } from 'lucide-react'
 
 const appText = new Map<string, string>([
   ['all', 'All Apps'],
@@ -38,13 +39,58 @@ export default function Apps() {
   const setActiveApp = useSetAtom(savedAppState)
   const { data: activeTeam } = useActiveTeam()
   const navigate = useNavigate()
+  const createSubscription = useCreateSubscription()
   const [sort, setSort] = useState('ascending')
-  const [appType, setAppType] = useState('all')
   const [searchTerm, setSearchTerm] = useState('')
 
-  const handleSubscribe = (appCode: string, appName: string) => {
-    // Mock subscription - show toast
-    toast.success(`Đã đăng ký ${appName} thành công!`)
+  // Check for invitation acceptance redirect
+  useEffect(() => {
+    const params = new URLSearchParams(window.location.search)
+
+    if (params.get('invitation_accepted') === 'true') {
+      toast.success('Invitation accepted!', {
+        description: 'You have successfully joined the team',
+      })
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+
+    const error = params.get('error')
+    if (error) {
+      const errorMessages: Record<string, string> = {
+        subscription_not_found: 'Subscription not found',
+        member_not_found: 'Member invitation not found',
+        email_mismatch: 'This invitation is not for your email',
+        invitation_already_accepted: 'This invitation has already been accepted',
+        server_error: 'An error occurred while processing the invitation',
+      }
+      toast.error('Failed to accept invitation', {
+        description: errorMessages[error] || 'Unknown error',
+      })
+      // Clean up URL
+      window.history.replaceState({}, '', window.location.pathname)
+    }
+  }, [])
+
+  const handleSubscribe = async (appId: string, appName: string) => {
+    if (!activeTeam?.id) {
+      toast.error('Vui lòng chọn team trước')
+      return
+    }
+
+    try {
+      await createSubscription.mutateAsync({
+        team_id: activeTeam.id,
+        app_id: appId,
+      })
+      toast.success(`Đã đăng ký ${appName} thành công!`, {
+        description: 'Subscription đang ở trạng thái "Đã đăng ký"',
+      })
+    } catch (error: any) {
+      toast.error('Đăng ký thất bại', {
+        description: error.message || 'Có lỗi xảy ra khi đăng ký app',
+      })
+    }
   }
 
   const handleAccess = (appCode: string) => {
@@ -66,7 +112,7 @@ export default function Apps() {
       <Header>
         <Search />
         <div className='ml-auto flex items-center gap-4'>
-          <TeamSelector />
+          <AppSelector />
           <ThemeSwitch />
           <ProfileDropdown />
         </div>
@@ -127,10 +173,12 @@ export default function Apps() {
               {filteredApps.map((app) => (
                 <li key={app.id}>
                   <AppSubscriptionCard
+                    appId={app.id}
                     appCode={app.code}
                     appName={app.name}
-                    onSubscribe={() => handleSubscribe(app.code, app.name)}
+                    onSubscribe={() => handleSubscribe(app.id, app.name)}
                     onAccess={() => handleAccess(app.code)}
+                    isSubscribing={createSubscription.isPending}
                   />
                 </li>
               ))}

@@ -3,6 +3,7 @@ import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
 import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
+import { AppSelector } from '@/components/app-selector'
 import { columns } from './components/columns'
 import { DataTable } from './components/data-table'
 import { TasksDialogs } from './components/tasks-dialogs'
@@ -16,6 +17,7 @@ export default function Tasks() {
       <Header fixed>
         <Search />
         <div className='ml-auto flex items-center space-x-4'>
+          <AppSelector />
           <ThemeSwitch />
           <ProfileDropdown />
         </div>

@@ -1,7 +1,7 @@
-import { useQuery } from '@tanstack/react-query'
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAtomValue } from 'jotai'
 import { activeTeamIdAtom } from '@/stores/applicationStore'
-import { request } from '@/utils/request'
+import { request, requestWithPost, requestWithPatch } from '@/utils/request'
 import type { AppPricing, AppSubscription } from '@/types/subscription'
 import type { Invoice } from '@/types/invoice'
 
@@ -10,12 +10,14 @@ export function useAppPricing() {
   return useQuery({
     queryKey: ['app-pricing'],
     queryFn: async () => {
-      return await request<AppPricing[]>('/app-pricing')
+      // TODO: Implement backend endpoint /app-pricing
+      return [] as AppPricing[]
     },
+    enabled: false, // Temporarily disabled - endpoint not implemented
   })
 }
 
-// Get app subscriptions for active team
+// Get app subscriptions for active team (using real API)
 export function useTeamSubscriptions(teamId?: string) {
   const activeTeamId = useAtomValue(activeTeamIdAtom)
   const selectedTeamId = teamId ?? activeTeamId
@@ -23,10 +25,31 @@ export function useTeamSubscriptions(teamId?: string) {
   return useQuery({
     queryKey: ['app-subscriptions', selectedTeamId],
     queryFn: async () => {
-      const allSubscriptions = await request<AppSubscription[]>('/app-subscriptions')
-      return allSubscriptions.filter(s => s.teamId === selectedTeamId)
+      if (!selectedTeamId) return []
+
+      // Call real API endpoint: GET /subscriptions?team_id=xxx
+      const API_URL = import.meta.env.VITE_API_URL
+      if (!API_URL) {
+        // Fallback to mock data if no API URL
+        const allSubscriptions = await request<AppSubscription[]>('/app-subscriptions')
+        return allSubscriptions.filter(s => s.teamId === selectedTeamId)
+      }
+
+      return await request<AppSubscription[]>(`/subscriptions?team_id=${selectedTeamId}`)
     },
     enabled: !!selectedTeamId,
+  })
+}
+
+// Get all invoices
+export function useAllInvoices() {
+  return useQuery({
+    queryKey: ['invoices'],
+    queryFn: async () => {
+      // TODO: Implement backend endpoint /invoices
+      return [] as Invoice[]
+    },
+    enabled: false, // Temporarily disabled - endpoint not implemented
   })
 }
 
@@ -38,26 +61,59 @@ export function useTeamInvoices(teamId?: string) {
   return useQuery({
     queryKey: ['invoices', selectedTeamId],
     queryFn: async () => {
-      const allInvoices = await request<Invoice[]>('/invoices')
-      return allInvoices.filter(inv => inv.teamId === selectedTeamId)
+      // TODO: Implement backend endpoint /invoices
+      return [] as Invoice[]
     },
-    enabled: !!selectedTeamId,
+    enabled: false, // Temporarily disabled - endpoint not implemented
   })
 }
 
 // Check if active team has subscription for specific app
-export function useAppSubscriptionStatus(appCode: string) {
-  const activeTeamId = useAtomValue(activeTeamIdAtom)
+export function useAppSubscriptionStatus(appId: string) {
   const { data: subscriptions } = useTeamSubscriptions()
 
-  const subscription = subscriptions?.find(s =>
-    s.appCode === appCode &&
-    (s.status === 'active' || s.status === 'trial')
+  const subscription = subscriptions?.find((s: AppSubscription) =>
+    s.app_id === appId &&
+    (s.status === 'registered' || s.status === 'active' || s.status === 'suspended')
   )
 
   return {
     isSubscribed: !!subscription,
     subscription,
-    canAccess: !!subscription && (subscription.status === 'active' || subscription.status === 'trial'),
+    canAccess: !!subscription && (subscription.status === 'registered' || subscription.status === 'active'),
   }
+}
+
+// Create new subscription (real API)
+export function useCreateSubscription() {
+  const queryClient = useQueryClient()
+  const activeTeamId = useAtomValue(activeTeamIdAtom)
+
+  return useMutation({
+    mutationFn: async (data: { team_id: string; app_id: string }) => {
+      return await requestWithPost('/subscriptions', data, {})
+    },
+    onSuccess: () => {
+      // Invalidate and refetch subscriptions
+      queryClient.invalidateQueries({ queryKey: ['app-subscriptions', activeTeamId] })
+    },
+  })
+}
+
+// Update subscription status (real API)
+export function useUpdateSubscriptionStatus() {
+  const queryClient = useQueryClient()
+  const activeTeamId = useAtomValue(activeTeamIdAtom)
+
+  return useMutation({
+    mutationFn: async (data: { subscriptionId: string; status: 'registered' | 'active' | 'suspended' }) => {
+      return await requestWithPatch(
+        `/subscriptions/${data.subscriptionId}`,
+        { status: data.status }
+      )
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['app-subscriptions', activeTeamId] })
+    },
+  })
 }

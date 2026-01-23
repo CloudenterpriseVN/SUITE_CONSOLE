@@ -1,16 +1,9 @@
-export interface InvoiceLineItem {
-  description: string
-  appCode: string  // CHANGED from planName
-  appName: string  // NEW
-  quantity: number
-  unitPrice: number
-  totalPrice: number
-}
-
 export interface Invoice {
   id: string
   invoiceNumber: string
-  teamId: string  // NEW: Changed from organizationId
+  teamId: string
+  appCode: string
+  appName: string
   status: 'draft' | 'pending' | 'paid' | 'failed' | 'cancelled'
   amount: number
   tax: number
@@ -19,13 +12,13 @@ export interface Invoice {
   paidAt?: string
   periodStart: string
   periodEnd: string
-  lineItems: InvoiceLineItem[]
+  description?: string
 }
 
 export interface PaymentRecord {
   id: string
   invoiceId: string
-  teamId: string  // NEW
+  teamId: string
   gateway: 'vnpay' | 'momo' | 'zalopay'
   amount: number
   status: 'pending' | 'processing' | 'completed' | 'failed'

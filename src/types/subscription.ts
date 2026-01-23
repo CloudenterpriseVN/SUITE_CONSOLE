@@ -13,12 +13,18 @@ export interface AppPricing {
 // App subscription - per-team per-app subscription
 export interface AppSubscription {
   id: string
-  teamId: string  // CHANGED from organizationId
-  appCode: string  // CHANGED from planId
-  status: 'trial' | 'active' | 'past_due' | 'cancelled' | 'expired'
-  billingCycle: 'monthly' | 'yearly'
-  currentPeriodStart: string
-  currentPeriodEnd: string
-  cancelAtPeriodEnd: boolean
-  subscribedAt: string
+  team_id: string
+  app_id: string
+  status: 'registered' | 'active' | 'suspended'
+  registered_by: string
+  create_at?: string
+  updated_at?: string
+  // Legacy fields for backward compatibility
+  teamId?: string
+  appCode?: string
+  billingCycle?: 'monthly' | 'yearly'
+  currentPeriodStart?: string
+  currentPeriodEnd?: string
+  cancelAtPeriodEnd?: boolean
+  subscribedAt?: string
 }

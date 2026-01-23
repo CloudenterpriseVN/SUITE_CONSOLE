@@ -3,6 +3,8 @@
     "id": "inv_001",
     "invoiceNumber": "INV-202601-0001",
     "teamId": "cDqxppoPoYHm6XKsKvlG",
+    "appCode": "com.cev.wms",
+    "appName": "WMS",
     "status": "paid",
     "amount": 500000,
     "tax": 50000,
@@ -11,21 +13,14 @@
     "paidAt": "2026-01-10T10:30:00Z",
     "periodStart": "2026-01-01T00:00:00Z",
     "periodEnd": "2026-01-31T23:59:59Z",
-    "lineItems": [
-      {
-        "description": "WMS - Warehouse Management System",
-        "appCode": "com.cev.wms",
-        "appName": "WMS",
-        "quantity": 1,
-        "unitPrice": 500000,
-        "totalPrice": 500000
-      }
-    ]
+    "description": "WMS - Warehouse Management System"
   },
   {
     "id": "inv_002",
     "invoiceNumber": "INV-202601-0002",
     "teamId": "cDqxppoPoYHm6XKsKvlG",
+    "appCode": "com.cev.ams",
+    "appName": "AMS",
     "status": "paid",
     "amount": 800000,
     "tax": 80000,
@@ -34,45 +29,51 @@
     "paidAt": "2026-01-12T14:20:00Z",
     "periodStart": "2026-01-01T00:00:00Z",
     "periodEnd": "2026-01-31T23:59:59Z",
-    "lineItems": [
-      {
-        "description": "AMS - Asset Management System",
-        "appCode": "com.cev.ams",
-        "appName": "AMS",
-        "quantity": 1,
-        "unitPrice": 800000,
-        "totalPrice": 800000
-      }
-    ]
+    "description": "AMS - Asset Management System"
   },
   {
     "id": "inv_003",
-    "invoiceNumber": "INV-202602-0003",
+    "invoiceNumber": "INV-202602-0001",
     "teamId": "cDqxppoPoYHm6XKsKvlG",
+    "appCode": "com.cev.wms",
+    "appName": "WMS",
     "status": "pending",
-    "amount": 1300000,
-    "tax": 130000,
-    "totalAmount": 1430000,
+    "amount": 500000,
+    "tax": 50000,
+    "totalAmount": 550000,
     "dueDate": "2026-02-15T00:00:00Z",
     "periodStart": "2026-02-01T00:00:00Z",
     "periodEnd": "2026-02-28T23:59:59Z",
-    "lineItems": [
-      {
-        "description": "WMS - Warehouse Management System",
-        "appCode": "com.cev.wms",
-        "appName": "WMS",
-        "quantity": 1,
-        "unitPrice": 500000,
-        "totalPrice": 500000
-      },
-      {
-        "description": "AMS - Asset Management System",
-        "appCode": "com.cev.ams",
-        "appName": "AMS",
-        "quantity": 1,
-        "unitPrice": 800000,
-        "totalPrice": 800000
-      }
-    ]
+    "description": "WMS - Warehouse Management System"
+  },
+  {
+    "id": "inv_004",
+    "invoiceNumber": "INV-202602-0002",
+    "teamId": "cDqxppoPoYHm6XKsKvlG",
+    "appCode": "com.cev.ams",
+    "appName": "AMS",
+    "status": "pending",
+    "amount": 800000,
+    "tax": 80000,
+    "totalAmount": 880000,
+    "dueDate": "2026-02-15T00:00:00Z",
+    "periodStart": "2026-02-01T00:00:00Z",
+    "periodEnd": "2026-02-28T23:59:59Z",
+    "description": "AMS - Asset Management System"
+  },
+  {
+    "id": "inv_005",
+    "invoiceNumber": "INV-202601-0003",
+    "teamId": "team_002",
+    "appCode": "com.cev.wms",
+    "appName": "WMS",
+    "status": "pending",
+    "amount": 500000,
+    "tax": 50000,
+    "totalAmount": 550000,
+    "dueDate": "2026-01-20T00:00:00Z",
+    "periodStart": "2026-01-01T00:00:00Z",
+    "periodEnd": "2026-01-31T23:59:59Z",
+    "description": "WMS - Warehouse Management System"
   }
 ]

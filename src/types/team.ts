@@ -21,13 +21,18 @@ export interface Team {
 
 export interface TeamMember {
   id: string
-  teamId: string
-  userId: string
   email: string
+  role: 'owner' | 'admin' | 'member'
+  status: 'active' | 'pending' | 'inactive'
+  invited_by: string
+  create_at?: string
+  updated_at?: string
+  // Legacy fields for backward compatibility
+  team_id?: string
+  teamId?: string
+  userId?: string
   displayName?: string
   photoURL?: string
-  role: 'owner' | 'billing_admin' | 'member'
-  status: 'active' | 'invited' | 'suspended'
   joinedAt?: string
 }
 

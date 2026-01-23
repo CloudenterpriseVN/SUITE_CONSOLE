@@ -2,6 +2,7 @@ import {
   IconCreditCard,
   IconHelp,
   IconLayoutDashboard,
+  IconMail,
   IconPackages,
   IconUserCog,
 } from '@tabler/icons-react'
@@ -23,6 +24,11 @@ export const sidebarData: SidebarData = {
           title: 'Billing',
           url: '/billing',
           icon: IconCreditCard,
+        },
+        {
+          title: 'Invitations',
+          url: '/invitations',
+          icon: IconMail,
         },
       ],
     },

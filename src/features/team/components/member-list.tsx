@@ -20,12 +20,12 @@ const roleLabels: Record<string, string> = {
 export function MemberList() {
   const { data: members } = useTeamMembers()
 
-  const handleRemoveMember = (memberId: string, memberName: string) => {
-    toast.success(`Đã xóa ${memberName} khỏi team`)
+  const handleRevokeMember = (memberId: string, memberEmail: string) => {
+    toast.success(`Đã thu hồi lời mời của ${memberEmail}`)
   }
 
-  const handleChangeRole = (memberId: string, memberName: string) => {
-    toast.info(`Thay đổi vai trò cho ${memberName}`)
+  const handleInviteAgain = (memberId: string, memberEmail: string) => {
+    toast.info(`Đã gửi lại lời mời cho ${memberEmail}`)
   }
 
   if (!members || members.length === 0) {
@@ -39,11 +39,10 @@ export function MemberList() {
           <div className="flex items-center gap-4">
             <Avatar>
               <AvatarImage src={member.photoURL} />
-              <AvatarFallback>{member.displayName?.[0]?.toUpperCase()}</AvatarFallback>
+              <AvatarFallback>{member.email?.[0]?.toUpperCase()}</AvatarFallback>
             </Avatar>
             <div>
-              <p className="font-medium">{member.displayName}</p>
-              <p className="text-sm text-muted-foreground">{member.email}</p>
+              <p className="font-medium">{member.email}</p>
             </div>
           </div>
           <div className="flex items-center gap-4">
@@ -56,14 +55,14 @@ export function MemberList() {
                   </Button>
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => handleChangeRole(member.id, member.displayName || member.email)}>
-                    Thay đổi vai trò
+                  <DropdownMenuItem onClick={() => handleInviteAgain(member.id, member.email)}>
+                    Gửi lại lời mời
                   </DropdownMenuItem>
                   <DropdownMenuItem
                     className="text-destructive"
-                    onClick={() => handleRemoveMember(member.id, member.displayName || member.email)}
+                    onClick={() => handleRevokeMember(member.id, member.email)}
                   >
-                    Xóa khỏi team
+                    Thu hồi
                   </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>

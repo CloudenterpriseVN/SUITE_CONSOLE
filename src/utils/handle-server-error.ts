@@ -1,4 +1,3 @@
-import { AxiosError } from 'axios'
 import { toast } from 'sonner'
 
 export function handleServerError(error: unknown) {
@@ -16,8 +15,9 @@ export function handleServerError(error: unknown) {
     errMsg = 'Content not found.'
   }
 
-  if (error instanceof AxiosError) {
-    errMsg = error.response?.data.title
+  if (error instanceof Error) {
+    // Extract error message from our fetch-based errors
+    errMsg = error.message
   }
 
   toast.error(errMsg)
