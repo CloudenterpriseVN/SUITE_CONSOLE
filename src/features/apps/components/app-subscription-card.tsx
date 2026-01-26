@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -12,6 +13,7 @@ interface AppSubscriptionCardProps {
   appId: string
   appCode: string
   appName: string
+  appLogo?: string
   onSubscribe: () => void
   onAccess: () => void
   isSubscribing?: boolean
@@ -21,6 +23,7 @@ export function AppSubscriptionCard({
   appId,
   appCode,
   appName,
+  appLogo,
   onSubscribe,
   onAccess,
   isSubscribing = false,
@@ -31,6 +34,7 @@ export function AppSubscriptionCard({
   const { can, isTeamVerified } = usePermission()
 
   const pricing = pricingList?.find(p => p.appCode === appCode)
+  const [imgError, setImgError] = useState(false)
 
   const handleSubscribe = () => {
     if (!activeTeam) {
@@ -52,8 +56,24 @@ export function AppSubscriptionCard({
   return (
     <Card>
       <CardHeader>
-        <CardTitle>{appName}</CardTitle>
-        <CardDescription>{pricing?.description}</CardDescription>
+        <div className="flex items-center gap-3">
+          {appLogo && !imgError ? (
+            <img
+              src={appLogo}
+              alt={appName}
+              className="h-10 w-10 rounded-lg object-contain bg-muted"
+              onError={() => setImgError(true)}
+            />
+          ) : (
+            <div className="h-10 w-10 rounded-lg bg-muted flex items-center justify-center text-muted-foreground text-sm font-medium">
+              {appName.charAt(0)}
+            </div>
+          )}
+          <div>
+            <CardTitle>{appName}</CardTitle>
+            <CardDescription>{pricing?.description}</CardDescription>
+          </div>
+        </div>
       </CardHeader>
       <CardContent className="space-y-4">
         {!isTeamVerified && activeTeam && (

@@ -1,5 +1,6 @@
 import { useTeamMembers } from '@/hooks/use-team'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
+import { getInitials } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import {
@@ -39,7 +40,7 @@ export function MemberList() {
           <div className="flex items-center gap-4">
             <Avatar>
               <AvatarImage src={member.photoURL} />
-              <AvatarFallback>{member.email?.[0]?.toUpperCase()}</AvatarFallback>
+              <AvatarFallback>{getInitials(member.displayName, member.email)}</AvatarFallback>
             </Avatar>
             <div>
               <p className="font-medium">{member.email}</p>

@@ -176,6 +176,7 @@ export default function Apps() {
                     appId={app.id}
                     appCode={app.code}
                     appName={app.name}
+                    appLogo={app.logo}
                     onSubscribe={() => handleSubscribe(app.id, app.name)}
                     onAccess={() => handleAccess(app.code)}
                     isSubscribing={createSubscription.isPending}

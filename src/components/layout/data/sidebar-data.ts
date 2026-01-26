@@ -1,7 +1,6 @@
 import {
   IconCreditCard,
   IconHelp,
-  IconLayoutDashboard,
   IconMail,
   IconPackages,
   IconUserCog,
@@ -35,11 +34,6 @@ export const sidebarData: SidebarData = {
     {
       title: 'Application',
       items: [
-        {
-          title: 'Dashboard',
-          url: '/dashboard',
-          icon: IconLayoutDashboard,
-        },
         {
           title: 'Settings',
           url: '/settings',
