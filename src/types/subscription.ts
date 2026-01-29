@@ -14,7 +14,9 @@ export interface AppPricing {
 export interface AppSubscription {
   id: string
   team_id: string
+  team_name?: string
   app_id: string
+  app_code?: string
   status: 'registered' | 'active' | 'suspended'
   registered_by: string
   create_at?: string
