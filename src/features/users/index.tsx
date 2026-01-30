@@ -1,4 +1,3 @@
-import { Main } from '@/components/layout/main'
 import { columns } from './components/users-columns'
 import { UsersDialogs } from './components/users-dialogs'
 import { UsersPrimaryButtons } from './components/users-primary-buttons'
@@ -22,7 +21,7 @@ export default function Users() {
 
   return (
     <UsersProvider>
-      <Main>
+      <div className='flex-1 w-full flex flex-col'>
         <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>Team Members</h2>
@@ -43,11 +42,11 @@ export default function Users() {
             <span className="text-muted-foreground">Loading members...</span>
           </div>
         ) : (
-          <div className='-mx-4 flex-1 overflow-auto px-4 py-1 lg:flex-row lg:space-y-0 lg:space-x-12'>
+          <div className='flex-1 overflow-auto py-1'>
             <UsersTable data={userList} columns={columns} />
           </div>
         )}
-      </Main>
+      </div>
 
       <UsersDialogs />
     </UsersProvider>

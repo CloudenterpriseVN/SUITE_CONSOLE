@@ -13,6 +13,7 @@ import {
   SelectValue,
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
+import { Skeleton } from '@/components/ui/skeleton'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
 import { ProfileDropdown } from '@/components/profile-dropdown'
@@ -20,10 +21,10 @@ import { Search } from '@/components/search'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { AppSelector } from '@/components/app-selector'
 import { AppSubscriptionCard } from './components/app-subscription-card'
-import { appsState, savedAppState } from '@/stores/applicationStore'
+import { loadableAppsState, savedAppState } from '@/stores/applicationStore'
 import { useActiveTeam } from '@/hooks/use-team'
 import { useCreateSubscription } from '@/hooks/use-app-subscription'
-import { useAtomValue, useSetAtom } from 'jotai'
+import { useAtom, useSetAtom } from 'jotai'
 import { useNavigate } from '@tanstack/react-router'
 import { toast } from 'sonner'
 import { AlertCircle } from 'lucide-react'
@@ -35,14 +36,17 @@ const appText = new Map<string, string>([
 ])
 
 export default function Apps() {
-  const apps = useAtomValue(appsState)
+  const [appsLoadable] = useAtom(loadableAppsState)
   const setActiveApp = useSetAtom(savedAppState)
-  const { data: activeTeam } = useActiveTeam()
+  const { data: activeTeam, isLoading: isTeamLoading } = useActiveTeam()
   const navigate = useNavigate()
   const createSubscription = useCreateSubscription()
   const [sort, setSort] = useState('ascending')
   const [searchTerm, setSearchTerm] = useState('')
   const [subscribingAppId, setSubscribingAppId] = useState<string | null>(null)
+
+  const isLoading = appsLoadable.state === 'loading' || isTeamLoading
+  const apps = appsLoadable.state === 'hasData' ? appsLoadable.data : []
 
   // Check for invitation acceptance redirect
   useEffect(() => {
@@ -100,7 +104,7 @@ export default function Apps() {
 
   const handleAccess = (appCode: string) => {
     setActiveApp(appCode)
-    navigate({ to: '/dashboard' })
+    navigate({ to: '/settings' })
   }
 
   const filteredApps = apps
@@ -134,7 +138,31 @@ export default function Apps() {
           </p>
         </div>
 
-        {!activeTeam ? (
+        {isLoading ? (
+          <>
+            <div className='my-4 flex items-end justify-between sm:my-0 sm:items-center'>
+              <Skeleton className='h-9 w-40 lg:w-[250px]' />
+              <Skeleton className='h-9 w-16' />
+            </div>
+            <Separator className='shadow-sm' />
+            <ul className='faded-bottom no-scrollbar grid gap-4 overflow-auto pt-4 pb-16 md:grid-cols-2 lg:grid-cols-3'>
+              {[1, 2, 3, 4, 5, 6].map((i) => (
+                <li key={i}>
+                  <div className='rounded-lg border p-4 space-y-3'>
+                    <div className='flex items-center gap-3'>
+                      <Skeleton className='h-12 w-12 rounded-lg' />
+                      <div className='space-y-2'>
+                        <Skeleton className='h-4 w-32' />
+                        <Skeleton className='h-3 w-24' />
+                      </div>
+                    </div>
+                    <Skeleton className='h-8 w-full' />
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </>
+        ) : !activeTeam ? (
           <div className="flex items-center gap-2 text-sm text-yellow-600 bg-yellow-50 p-4 rounded-md my-4">
             <AlertCircle className="h-4 w-4" />
             <span>Vui lòng chọn team để xem và đăng ký ứng dụng</span>

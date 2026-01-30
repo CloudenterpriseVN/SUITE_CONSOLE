@@ -1,9 +1,6 @@
-import Cookies from 'js-cookie'
 import { atom, useAtom } from 'jotai'
 import { auth, googleProvider } from '@/lib/firebase'
-import { signInWithPopup, signOut as firebaseSignOut } from 'firebase/auth'
-
-const ACCESS_TOKEN = 'access_token'
+import { signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged, User } from 'firebase/auth'
 
 export interface AuthUser {
   accountNo: string
@@ -12,32 +9,21 @@ export interface AuthUser {
   role: string[]
   avatar?: string
   exp: number
-  // Team role is now determined by team-members.json based on email
-}
-
-// Initialize user from localStorage
-const getInitialUser = (): AuthUser | null => {
-  try {
-    const stored = localStorage.getItem('auth_user')
-    return stored ? JSON.parse(stored) : null
-  } catch {
-    return null
-  }
-}
-
-// Initialize token from Cookies
-const getInitialToken = (): string => {
-  try {
-    const stored = Cookies.get(ACCESS_TOKEN)
-    return stored || ''
-  } catch {
-    return ''
-  }
 }
 
 // Create atoms
-export const userAtom = atom<AuthUser | null>(getInitialUser())
-export const accessTokenAtom = atom<string>(getInitialToken())
+export const userAtom = atom<AuthUser | null>(null)
+export const accessTokenAtom = atom<string>('')
+
+// Helper để convert Firebase User sang AuthUser
+const firebaseUserToAuthUser = (user: User): AuthUser => ({
+  accountNo: user.uid,
+  name: user.displayName ?? '',
+  email: user.email ?? '',
+  avatar: user.photoURL ?? '',
+  role: [],
+  exp: 0,
+})
 
 // Sign in with Google
 export const signInWithGoogle = async (
@@ -48,26 +34,7 @@ export const signInWithGoogle = async (
   const user = result.user
   const token = await user.getIdToken()
 
-  const authUser: AuthUser = {
-    accountNo: user.uid,
-    name: user.displayName ?? '',
-    email: user.email ?? '',
-    avatar: user.photoURL ?? '',
-    role: [],
-    exp: 0,
-  }
-
-  // Save to localStorage and Cookies
-  localStorage.setItem('auth_user', JSON.stringify(authUser))
-  Cookies.set(ACCESS_TOKEN, token, { sameSite: 'lax', path: '/' })
-
-  // Debug: Log token info
-  if (import.meta.env.DEV) {
-    // eslint-disable-next-line no-console
-    console.log('[Auth] Token saved to cookie, length:', token.length)
-    // eslint-disable-next-line no-console
-    console.log('[Auth] Token preview:', token.substring(0, 50) + '...')
-  }
+  const authUser = firebaseUserToAuthUser(user)
 
   // Update atoms
   setUser(authUser)
@@ -82,10 +49,6 @@ export const signOut = async (
   try {
     await firebaseSignOut(auth)
   } finally {
-    // Clear storage
-    localStorage.removeItem('auth_user')
-    Cookies.remove(ACCESS_TOKEN)
-
     // Reset atoms
     setUser(null)
     setAccessToken('')
@@ -111,8 +74,40 @@ export const useAuthStore = () => {
   }
 }
 
-// Helper to reset auth state (for use outside React components)
-export const resetAuthState = () => {
-  localStorage.removeItem('auth_user')
-  Cookies.remove(ACCESS_TOKEN)
+// Hook để sync Firebase auth state với atoms
+export const useAuthSync = () => {
+  const [, setUser] = useAtom(userAtom)
+  const [, setAccessToken] = useAtom(accessTokenAtom)
+
+  const syncAuth = () => {
+    return onAuthStateChanged(auth, async (firebaseUser) => {
+      if (firebaseUser) {
+        const token = await firebaseUser.getIdToken()
+        const authUser = firebaseUserToAuthUser(firebaseUser)
+        setUser(authUser)
+        setAccessToken(token)
+      } else {
+        setUser(null)
+        setAccessToken('')
+      }
+    })
+  }
+
+  return { syncAuth }
+}
+
+// Hook lấy current user - ưu tiên từ atom, fallback về Firebase
+export const useCurrentUser = (): AuthUser | null => {
+  const [user] = useAtom(userAtom)
+
+  // Nếu atom đã có user thì dùng
+  if (user) return user
+
+  // Fallback: lấy từ Firebase currentUser
+  const firebaseUser = auth.currentUser
+  if (firebaseUser) {
+    return firebaseUserToAuthUser(firebaseUser)
+  }
+
+  return null
 }

@@ -2,19 +2,11 @@
   {
     "id": "cDqxppoPoYHm6XKsKvlG",
     "name": "Suite Cloud Vietnam",
+    "fullName": "Công ty TNHH Suite Cloud Vietnam",
     "owner": "ncliam@gmail.com",
-    "verified": true,
     "logo": "https://placehold.co/100x100/png",
-    "status": "active",
-    "billingEmail": "billing@suitecloud.vn",
+    "billingAddress": "123 Đường Nguyễn Huệ, Quận 1, TP. Hồ Chí Minh",
     "taxId": "0123456789",
-    "address": {
-      "street": "123 Đường Nguyễn Huệ",
-      "city": "Quận 1",
-      "province": "TP. Hồ Chí Minh",
-      "postalCode": "700000",
-      "country": "VN"
-    },
     "createdAt": "2025-01-01T00:00:00Z",
     "updatedAt": "2026-01-05T10:00:00Z",
     "key": "teams/cDqxppoPoYHm6XKsKvlG"
@@ -22,10 +14,9 @@
   {
     "id": "team_002",
     "name": "Startup ABC",
+    "fullName": "Công ty Startup ABC",
     "owner": "ncliam@gmail.com",
-    "verified": false,
-    "status": "pending_verification",
-    "billingEmail": "contact@startup-abc.com",
+    "billingAddress": "456 Đường Lê Lợi, Quận 3, TP. Hồ Chí Minh",
     "createdAt": "2026-01-05T00:00:00Z",
     "updatedAt": "2026-01-05T00:00:00Z",
     "key": "teams/team_002"

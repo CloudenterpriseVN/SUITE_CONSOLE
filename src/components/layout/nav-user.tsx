@@ -1,5 +1,5 @@
 import { Link, useNavigate } from '@tanstack/react-router'
-import { useAuthStore } from '@/stores/authStore'
+import { useAuthStore, useCurrentUser } from '@/stores/authStore'
 import {
   BadgeCheck,
   Bell,
@@ -30,7 +30,7 @@ export function NavUser() {
   const { isMobile } = useSidebar()
   const navigate = useNavigate()
   const { auth } = useAuthStore()
-  const user = auth.user
+  const user = useCurrentUser()
   const signOut = auth.signOut
 
   if (!user) return null;

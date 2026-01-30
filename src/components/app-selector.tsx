@@ -46,11 +46,6 @@ export function AppSelector() {
           <SelectItem key={app.id} value={app.code}>
             <div className="flex items-center gap-2">
               <span>{app.name}</span>
-              {app.code === activeAppCode && (
-                <Badge variant="default" className="text-xs">
-                  Selected
-                </Badge>
-              )}
             </div>
           </SelectItem>
         ))}

@@ -1,7 +1,5 @@
-import { useAtomValue } from 'jotai'
-import { userAtom } from '@/stores/authStore'
-import { activeTeamIdAtom } from '@/stores/applicationStore'
-import { useTeamMembers, useActiveTeam } from './use-team'
+import { useCurrentUser } from '@/stores/authStore'
+import { useTeamMembers } from './use-team'
 import type { TeamPermission } from '@/types/team'
 
 const rolePermissions: Record<string, TeamPermission[]> = {
@@ -31,9 +29,7 @@ const rolePermissions: Record<string, TeamPermission[]> = {
 }
 
 export function usePermission() {
-  const user = useAtomValue(userAtom)
-  const activeTeamId = useAtomValue(activeTeamIdAtom)
-  const { data: activeTeam } = useActiveTeam()
+  const user = useCurrentUser()
   const { data: members } = useTeamMembers()
 
   // Tìm role của user trong active team
@@ -41,11 +37,6 @@ export function usePermission() {
   const teamRole = currentMember?.role || 'member'
 
   const can = (permission: TeamPermission): boolean => {
-    // *** KEY: subscribe:apps chỉ available nếu team verified
-    if (permission === 'subscribe:apps' && !activeTeam?.verified) {
-      return false
-    }
-
     return rolePermissions[teamRole]?.includes(permission) ?? false
   }
 
@@ -57,6 +48,5 @@ export function usePermission() {
     can,
     hasRole,
     role: teamRole,
-    isTeamVerified: activeTeam?.verified ?? false,
   }
 }

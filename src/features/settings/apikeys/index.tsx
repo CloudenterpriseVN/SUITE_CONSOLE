@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useAtomValue } from 'jotai'
 import { IconKey, IconPlus, IconTrash, IconRefresh, IconCopy, IconCheck, IconAlertTriangle } from '@tabler/icons-react'
-import { Main } from '@/components/layout/main'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
@@ -33,7 +32,7 @@ import {
   AlertDialogTitle,
 } from '@/components/ui/alert-dialog'
 import { Alert, AlertDescription } from '@/components/ui/alert'
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import { savedAppState } from '@/stores/applicationStore'
 import {
   useActiveSubscription,
@@ -135,12 +134,12 @@ export default function APIKeys() {
   // No active app selected
   if (!activeAppCode) {
     return (
-      <Main>
+      <div className='flex-1 w-full'>
         <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>API Keys</h2>
             <p className='text-muted-foreground'>
-              Manage your API keys for integration
+              Sử dụng các key này để tích hợp với ứng dụng qua REST API
             </p>
           </div>
         </div>
@@ -151,19 +150,19 @@ export default function APIKeys() {
             <p className="text-sm text-muted-foreground">Use the app selector in the header to choose an app</p>
           </CardContent>
         </Card>
-      </Main>
+      </div>
     )
   }
 
   // No subscription for this app
   if (!isLoading && !hasSubscription) {
     return (
-      <Main>
+      <div className='flex-1 w-full'>
         <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>API Keys</h2>
             <p className='text-muted-foreground'>
-              Manage your API keys for integration
+              Sử dụng các key này để tích hợp với ứng dụng qua REST API
             </p>
           </div>
         </div>
@@ -174,17 +173,17 @@ export default function APIKeys() {
             <p className="text-sm text-muted-foreground">Subscribe to the app first to manage API keys</p>
           </CardContent>
         </Card>
-      </Main>
+      </div>
     )
   }
 
   return (
-    <Main>
+    <div className='flex-1 w-full flex flex-col'>
       <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
         <div>
           <h2 className='text-2xl font-bold tracking-tight'>API Keys</h2>
           <p className='text-muted-foreground'>
-            Manage your API keys for {subscription?.app_code || activeAppCode}
+            Sử dụng các key này để tích hợp với ứng dụng qua REST API
           </p>
         </div>
         <Button onClick={() => setCreateDialogOpen(true)} disabled={!hasSubscription}>
@@ -193,14 +192,14 @@ export default function APIKeys() {
         </Button>
       </div>
 
-      <div className='-mx-4 flex-1 overflow-auto px-4 py-4'>
+      <div className='flex-1 overflow-auto py-4'>
         {isLoading ? (
           <div className="flex items-center justify-center h-48">
             <Loader2 className="h-8 w-8 animate-spin text-muted-foreground" />
           </div>
         ) : apiKeys && apiKeys.length > 0 ? (
           <Card>
-            <CardHeader>
+            {/* <CardHeader>
               <div className="flex items-center gap-2">
                 <IconKey className="h-5 w-5" />
                 <CardTitle>Active API Keys</CardTitle>
@@ -208,7 +207,7 @@ export default function APIKeys() {
               <CardDescription>
                 These keys can be used to authenticate API requests for this app.
               </CardDescription>
-            </CardHeader>
+            </CardHeader> */}
             <CardContent>
               <Table>
                 <TableHeader>
@@ -476,6 +475,6 @@ export default function APIKeys() {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
-    </Main>
+    </div>
   )
 }

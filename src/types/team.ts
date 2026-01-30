@@ -1,19 +1,11 @@
 export interface Team {
   id: string
-  name: string
-  owner: string  // email của owner
-  verified: boolean  // *** KEY: Team verification
+  name: string             // Tên ngắn (hiển thị)
+  fullName?: string        // Tên đầy đủ (xuất hoá đơn)
+  owner: string            // email của owner (dùng cho billing)
   logo?: string
-  status: 'active' | 'suspended' | 'pending_verification'
-  billingEmail: string
-  taxId?: string
-  address?: {
-    street: string
-    city: string
-    province: string
-    postalCode: string
-    country: string
-  }
+  billingAddress?: string  // Địa chỉ xuất hoá đơn
+  taxId?: string           // Mã số thuế
   createdAt: string
   updatedAt: string
   key?: string  // Firestore key (optional, for compatibility)
@@ -44,5 +36,5 @@ export type TeamPermission =
   | 'invite:members'
   | 'manage:members'
   | 'edit:team'
-  | 'subscribe:apps'  // Chỉ verified team mới có
+  | 'subscribe:apps'
   | 'access:apps'

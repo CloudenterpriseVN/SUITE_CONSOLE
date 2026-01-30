@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { ChevronsUpDown, Check, Plus, Pencil, AlertCircle } from 'lucide-react'
+import { useState, useEffect } from 'react'
+import { ChevronsUpDown, Check, Plus, Pencil, Building2, Loader2 } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -15,27 +15,37 @@ import {
   SidebarMenuItem,
   useSidebar,
 } from '@/components/ui/sidebar'
-import { Badge } from '@/components/ui/badge'
+import { Skeleton } from '@/components/ui/skeleton'
 import { useAtom } from 'jotai'
-import { teamsState, activeTeamIdAtom, localTeamsAtom, modifiedTeamIdsAtom } from '@/stores/applicationStore'
+import { activeTeamIdAtom } from '@/stores/applicationStore'
+import { useTeams, useCreateTeam, useUpdateTeam } from '@/hooks/use-team'
 import { TeamDialog } from '@/components/team-dialog'
 import type { Team } from '@/types/team'
 import { toast } from 'sonner'
 
 export function TeamSwitcher() {
   const { isMobile } = useSidebar()
-  const [teams] = useAtom(teamsState)
+  const { data: teams, isLoading } = useTeams()
   const [activeTeamId, setActiveTeamId] = useAtom(activeTeamIdAtom)
-  const [, setLocalTeams] = useAtom(localTeamsAtom)
-  const [modifiedTeamIds, setModifiedTeamIds] = useAtom(modifiedTeamIdsAtom)
+
+  const createTeam = useCreateTeam()
+  const updateTeam = useUpdateTeam()
 
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editingTeam, setEditingTeam] = useState<Team | null>(null)
 
-  // Chỉ lấy các team đã được phê duyệt để switch
   const teamArray = Array.isArray(teams) ? teams : []
-  const verifiedTeams = teamArray.filter((team: Team) => team.verified)
-  const activeTeam = verifiedTeams.find((t: Team) => t.id === activeTeamId) ?? verifiedTeams[0]
+  const activeTeam = teamArray.find((t: Team) => t.id === activeTeamId) ?? teamArray[0]
+
+  // Tự động chọn team đầu tiên nếu chưa có active team hoặc team hiện tại không hợp lệ
+  useEffect(() => {
+    if (teamArray.length > 0) {
+      const currentTeamValid = activeTeamId && teamArray.some((t: Team) => t.id === activeTeamId)
+      if (!currentTeamValid) {
+        setActiveTeamId(teamArray[0].id)
+      }
+    }
+  }, [activeTeamId, teamArray, setActiveTeamId])
 
   const handleAddTeam = () => {
     setEditingTeam(null)
@@ -48,42 +58,75 @@ export function TeamSwitcher() {
     setDialogOpen(true)
   }
 
-  const handleSaveTeam = (teamData: Partial<Team>) => {
-    if (editingTeam) {
-      // Edit mode
-      const updatedTeams = teamArray.map((t: Team) =>
-        t.id === editingTeam.id
-          ? { ...t, ...teamData, updatedAt: new Date().toISOString() }
-          : t
-      )
-      setLocalTeams(updatedTeams)
-      setModifiedTeamIds(new Set([...modifiedTeamIds, editingTeam.id]))
-      toast.success('Đã cập nhật team')
-    } else {
-      // Add mode
-      const newTeam: Team = {
-        id: `team_${Date.now()}`,
-        name: teamData.name || '',
-        owner: '', // Will be set by server
-        verified: false,
-        status: 'pending_verification',
-        billingEmail: teamData.billingEmail || '',
-        taxId: teamData.taxId,
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
+  const handleSaveTeam = async (teamData: Partial<Team>) => {
+    try {
+      if (editingTeam) {
+        await updateTeam.mutateAsync({ id: editingTeam.id, ...teamData })
+        toast.success('Đã cập nhật team')
+      } else {
+        await createTeam.mutateAsync(teamData)
+        toast.success('Đã tạo team mới')
       }
-      setLocalTeams([...teamArray, newTeam])
-      setModifiedTeamIds(new Set([...modifiedTeamIds, newTeam.id]))
-      toast.success('Đã tạo team mới. Team cần được phê duyệt trước khi sử dụng.')
+      setDialogOpen(false)
+    } catch (error) {
+      toast.error(editingTeam ? 'Không thể cập nhật team' : 'Không thể tạo team')
     }
   }
 
   const handleSwitchTeam = (team: Team) => {
-    if (!team.verified) {
-      toast.error('Chỉ có thể chuyển sang team đã được phê duyệt')
-      return
-    }
     setActiveTeamId(team.id)
+  }
+
+  const isSaving = createTeam.isPending || updateTeam.isPending
+
+  if (isLoading) {
+    return (
+      <SidebarMenu>
+        <SidebarMenuItem>
+          <SidebarMenuButton size='lg' disabled>
+            <Skeleton className='size-8 rounded-lg' />
+            <div className='grid flex-1 gap-1'>
+              <Skeleton className='h-4 w-24' />
+              <Skeleton className='h-3 w-16' />
+            </div>
+          </SidebarMenuButton>
+        </SidebarMenuItem>
+      </SidebarMenu>
+    )
+  }
+
+  // Hiển thị UI tạo team khi chưa có team nào
+  if (teamArray.length === 0) {
+    return (
+      <>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              size='lg'
+              onClick={handleAddTeam}
+              className='border-2 border-dashed border-primary/50 hover:border-primary hover:bg-primary/5'
+            >
+              <div className='bg-primary/10 text-primary flex aspect-square size-8 items-center justify-center rounded-lg'>
+                <Building2 className='size-4' />
+              </div>
+              <div className='grid flex-1 text-left text-sm leading-tight'>
+                <span className='truncate font-semibold'>Tạo Team</span>
+                <span className='truncate text-xs text-muted-foreground'>Bắt đầu sử dụng</span>
+              </div>
+              <Plus className='ml-auto size-4 text-primary' />
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+
+        <TeamDialog
+          open={dialogOpen}
+          onOpenChange={setDialogOpen}
+          team={null}
+          onSave={handleSaveTeam}
+          isSaving={isSaving}
+        />
+      </>
+    )
   }
 
   return (
@@ -103,7 +146,7 @@ export function TeamSwitcher() {
                 </div>
                 <div className='grid flex-1 text-left text-sm leading-tight'>
                   <span className='truncate font-semibold'>Suite Console</span>
-                  <span className='truncate text-xs'>{activeTeam?.name ?? '—'}</span>
+                  <span className='truncate text-xs'>{activeTeam?.name ?? ''}</span>
                 </div>
                 <ChevronsUpDown className='ml-auto' />
               </SidebarMenuButton>
@@ -122,29 +165,11 @@ export function TeamSwitcher() {
                   key={team.id}
                   onClick={() => handleSwitchTeam(team)}
                   className='gap-2 p-2'
-                  disabled={!team.verified}
                 >
                   <div className='flex size-6 items-center justify-center rounded-sm border'>
                     <span className='text-sm font-medium'>{team.name?.charAt(0) ?? 'T'}</span>
                   </div>
-                  <div className='flex flex-1 flex-col'>
-                    <span className={!team.verified ? 'text-muted-foreground' : ''}>
-                      {team.name}
-                    </span>
-                    <div className='flex items-center gap-1'>
-                      {!team.verified && (
-                        <Badge variant='secondary' className='text-[10px] px-1 py-0'>
-                          Chờ duyệt
-                        </Badge>
-                      )}
-                      {modifiedTeamIds.has(team.id) && (
-                        <Badge variant='outline' className='text-[10px] px-1 py-0 text-orange-600 border-orange-300'>
-                          <AlertCircle className='h-2.5 w-2.5 mr-0.5' />
-                          Có thay đổi
-                        </Badge>
-                      )}
-                    </div>
-                  </div>
+                  <span className='flex-1'>{team.name}</span>
                   {activeTeamId === team.id && <Check className='h-4 w-4' />}
                   <button
                     onClick={(e) => handleEditTeam(team, e)}
@@ -172,6 +197,7 @@ export function TeamSwitcher() {
         onOpenChange={setDialogOpen}
         team={editingTeam}
         onSave={handleSaveTeam}
+        isSaving={isSaving}
       />
     </>
   )

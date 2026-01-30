@@ -1,5 +1,4 @@
-import { resetAuthState } from '@/stores/authStore'
-import Cookies from 'js-cookie'
+import { auth } from '@/lib/firebase'
 
 const API_URL = import.meta.env.VITE_API_URL
 
@@ -8,19 +7,15 @@ const mockUrls = import.meta.glob<{ default: string }>("../mock/*.json", {
   eager: true,
 });
 
-function getAccessTokenFromCookie(): string | undefined {
-  if (typeof document === 'undefined') return undefined
+async function getAccessToken(): Promise<string | null> {
+  const user = auth.currentUser
+  if (!user) return null
 
-  const token = Cookies.get('access_token')
-
-  if (import.meta.env.DEV) {
-    // eslint-disable-next-line no-console
-    console.log('[Request] Token from js-cookie:', token ? `length: ${token.length}` : 'not found')
-    // eslint-disable-next-line no-console
-    console.log('[Request] All cookies:', document.cookie.substring(0, 100) + '...')
+  try {
+    return await user.getIdToken()
+  } catch {
+    return null
   }
-
-  return token
 }
 
 export async function request<T>(
@@ -35,27 +30,17 @@ export async function request<T>(
     await new Promise((resolve) => setTimeout(resolve, 500));
   }
 
-  // Attach X-Access-Token header from cookie when present
-  const token = getAccessTokenFromCookie()
+  // Lấy token từ Firebase
+  const token = await getAccessToken()
   const headers = new Headers(options?.headers as HeadersInit)
   if (token) {
     headers.set('X-Access-Token', token)
-    if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
-      console.log('[Request] Token found, length:', token.length)
-    }
-  } else {
-    if (import.meta.env.DEV) {
-      // eslint-disable-next-line no-console
-      console.log('[Request] No token found in cookie')
-    }
   }
 
   const response = await fetch(url, { ...(options ?? {}), headers });
 
-  // Handle 401 Unauthorized - clear auth state and let app redirect to login
+  // Handle 401 Unauthorized
   if (response.status === 401) {
-    resetAuthState()
     throw new Error('Unauthorized')
   }
 

@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { useAtomValue } from 'jotai'
+import { useAtomValue, useSetAtom } from 'jotai'
 import { activeTeamIdAtom, savedAppState, appsState } from '@/stores/applicationStore'
-import { request, requestWithPost, requestWithDelete } from '@/utils/request'
+import { request, requestWithPost, requestWithPatch, requestWithDelete } from '@/utils/request'
 import type { Team, TeamMember } from '@/types/team'
 import { useTeamSubscriptions } from './use-app-subscription'
 
@@ -11,6 +11,39 @@ export function useTeams() {
     queryKey: ['teams'],
     queryFn: async () => {
       return await request<Team[]>('/teams')
+    },
+  })
+}
+
+// Create new team
+export function useCreateTeam() {
+  const queryClient = useQueryClient()
+  const setActiveTeamId = useSetAtom(activeTeamIdAtom)
+
+  return useMutation({
+    mutationFn: async (teamData: Partial<Team>) => {
+      return await requestWithPost<Partial<Team>, Team>('/teams', teamData)
+    },
+    onSuccess: (newTeam) => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] })
+      // Tự động chọn team mới tạo
+      if (newTeam?.id) {
+        setActiveTeamId(newTeam.id)
+      }
+    },
+  })
+}
+
+// Update team
+export function useUpdateTeam() {
+  const queryClient = useQueryClient()
+
+  return useMutation({
+    mutationFn: async ({ id, ...teamData }: Partial<Team> & { id: string }) => {
+      return await requestWithPatch<Partial<Team>, Team>(`/teams/${id}`, teamData)
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['teams'] })
     },
   })
 }

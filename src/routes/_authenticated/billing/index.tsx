@@ -24,7 +24,7 @@ function BillingPage() {
         <CardHeader>
           <CardTitle>Danh sách hoá đơn</CardTitle>
           <CardDescription>
-            Tất cả hoá đơn của các team bạn tham gia
+            Tất cả hoá đơn
           </CardDescription>
         </CardHeader>
         <CardContent>

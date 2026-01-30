@@ -1,7 +1,7 @@
 import { Link, useNavigate } from '@tanstack/react-router'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
 import { Button } from '@/components/ui/button'
-import { useAuthStore } from '@/stores/authStore'
+import { useAuthStore, useCurrentUser } from '@/stores/authStore'
 import { getInitials } from '@/lib/utils'
 import {
   DropdownMenu,
@@ -17,7 +17,7 @@ import {
 export function ProfileDropdown() {
   const { auth } = useAuthStore()
   const navigate = useNavigate()
-  const user = auth.user
+  const user = useCurrentUser()
   const signOut = auth.signOut
 
   if (!user) return null;

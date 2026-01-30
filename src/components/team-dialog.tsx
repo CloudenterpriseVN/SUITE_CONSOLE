@@ -10,49 +10,54 @@ import {
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Loader2 } from 'lucide-react'
 import type { Team } from '@/types/team'
 
 interface TeamDialogProps {
   open: boolean
   onOpenChange: (open: boolean) => void
   team?: Team | null // null = add mode, Team = edit mode
-  onSave: (team: Partial<Team>) => void
+  onSave: (team: Partial<Team>) => void | Promise<void>
+  isSaving?: boolean
 }
 
-export function TeamDialog({ open, onOpenChange, team, onSave }: TeamDialogProps) {
+export function TeamDialog({ open, onOpenChange, team, onSave, isSaving }: TeamDialogProps) {
   const isEditMode = !!team
 
   const [formData, setFormData] = useState({
     name: '',
+    fullName: '',
+    billingAddress: '',
     taxId: '',
-    billingEmail: '',
   })
 
   useEffect(() => {
     if (team) {
       setFormData({
         name: team.name || '',
+        fullName: team.fullName || '',
+        billingAddress: team.billingAddress || '',
         taxId: team.taxId || '',
-        billingEmail: team.billingEmail || '',
       })
     } else {
       setFormData({
         name: '',
+        fullName: '',
+        billingAddress: '',
         taxId: '',
-        billingEmail: '',
       })
     }
   }, [team, open])
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    onSave({
+    await onSave({
       ...(team ? { id: team.id } : {}),
       name: formData.name,
+      fullName: formData.fullName,
+      billingAddress: formData.billingAddress,
       taxId: formData.taxId,
-      billingEmail: formData.billingEmail,
     })
-    onOpenChange(false)
   }
 
   return (
@@ -65,8 +70,8 @@ export function TeamDialog({ open, onOpenChange, team, onSave }: TeamDialogProps
             </DialogTitle>
             <DialogDescription>
               {isEditMode
-                ? 'Cập nhật thông tin team. Team cần được phê duyệt lại sau khi thay đổi.'
-                : 'Tạo team mới. Team sẽ cần được phê duyệt trước khi sử dụng.'}
+                ? 'Cập nhật thông tin team.'
+                : 'Tạo team mới để bắt đầu sử dụng.'}
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4 py-4">
@@ -76,8 +81,31 @@ export function TeamDialog({ open, onOpenChange, team, onSave }: TeamDialogProps
                 id="name"
                 value={formData.name}
                 onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                placeholder="Nhập tên team"
+                placeholder="Tên ngắn gọn để hiển thị"
                 required
+                disabled={isSaving}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="fullName">Tên đầy đủ *</Label>
+              <Input
+                id="fullName"
+                value={formData.fullName}
+                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                placeholder="Tên đầy đủ (xuất hoá đơn)"
+                required
+                disabled={isSaving}
+              />
+            </div>
+            <div className="grid gap-2">
+              <Label htmlFor="billingAddress">Địa chỉ xuất hoá đơn *</Label>
+              <Input
+                id="billingAddress"
+                value={formData.billingAddress}
+                onChange={(e) => setFormData({ ...formData, billingAddress: e.target.value })}
+                placeholder="Địa chỉ đầy đủ"
+                required
+                disabled={isSaving}
               />
             </div>
             <div className="grid gap-2">
@@ -86,26 +114,17 @@ export function TeamDialog({ open, onOpenChange, team, onSave }: TeamDialogProps
                 id="taxId"
                 value={formData.taxId}
                 onChange={(e) => setFormData({ ...formData, taxId: e.target.value })}
-                placeholder="Nhập mã số thuế"
-              />
-            </div>
-            <div className="grid gap-2">
-              <Label htmlFor="billingEmail">Email thanh toán *</Label>
-              <Input
-                id="billingEmail"
-                type="email"
-                value={formData.billingEmail}
-                onChange={(e) => setFormData({ ...formData, billingEmail: e.target.value })}
-                placeholder="billing@example.com"
-                required
+                placeholder="Nhập mã số thuế (nếu có)"
+                disabled={isSaving}
               />
             </div>
           </div>
           <DialogFooter>
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button type="button" variant="outline" onClick={() => onOpenChange(false)} disabled={isSaving}>
               Hủy
             </Button>
-            <Button type="submit">
+            <Button type="submit" disabled={isSaving}>
+              {isSaving && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
               {isEditMode ? 'Lưu thay đổi' : 'Tạo Team'}
             </Button>
           </DialogFooter>

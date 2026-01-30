@@ -5,8 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { useAppSubscriptionStatus } from '@/hooks/use-app-subscription'
 import { useAppPricing } from '@/hooks/use-app-subscription'
 import { useActiveTeam } from '@/hooks/use-team'
-import { usePermission } from '@/hooks/use-permission'
-import { AlertCircle, Loader2 } from 'lucide-react'
+import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
 interface AppSubscriptionCardProps {
@@ -31,7 +30,6 @@ export function AppSubscriptionCard({
   const { data: pricingList } = useAppPricing()
   const { isSubscribed, subscription } = useAppSubscriptionStatus(appId)
   const { data: activeTeam } = useActiveTeam()
-  const { can, isTeamVerified } = usePermission()
 
   const pricing = pricingList?.find(p => p.appCode === appCode)
   const [imgError, setImgError] = useState(false)
@@ -39,13 +37,6 @@ export function AppSubscriptionCard({
   const handleSubscribe = () => {
     if (!activeTeam) {
       toast.error('Vui lòng chọn team trước')
-      return
-    }
-
-    if (!isTeamVerified) {
-      toast.error('Team chưa được xác minh', {
-        description: 'Vui lòng chờ team được duyệt trước khi đăng ký app',
-      })
       return
     }
 
@@ -76,13 +67,6 @@ export function AppSubscriptionCard({
         </div>
       </CardHeader>
       <CardContent className="space-y-4">
-        {!isTeamVerified && activeTeam && (
-          <div className="flex items-center gap-2 text-sm text-yellow-600 bg-yellow-50 p-3 rounded-md">
-            <AlertCircle className="h-4 w-4" />
-            <span>Team chưa được xác minh. Không thể đăng ký app.</span>
-          </div>
-        )}
-
         {pricing && (
           <div>
             <p className="text-2xl font-bold">
@@ -129,7 +113,7 @@ export function AppSubscriptionCard({
             size="sm"
             className="w-full"
             onClick={handleSubscribe}
-            disabled={!isTeamVerified || !activeTeam || isSubscribing}
+            disabled={!activeTeam || isSubscribing}
           >
             {isSubscribing ? (
               <>
