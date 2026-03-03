@@ -31,6 +31,7 @@ async function signPayload(payload: object): Promise<string> {
 
 export async function generateQRCredential(opts: {
   team: { id: string; name: string }
+  subscriptionId: string
   issuedBy: string
   ttlMs: number
 }): Promise<string> {
@@ -39,6 +40,7 @@ export async function generateQRCredential(opts: {
     version: "1" as const,
     teamId: opts.team.id,
     teamName: opts.team.name,
+    subscriptionId: opts.subscriptionId,
     appCode: "wms",
     issuedBy: opts.issuedBy,
     issuedAt: now,
