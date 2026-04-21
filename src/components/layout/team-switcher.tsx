@@ -43,9 +43,18 @@ export function TeamSwitcher() {
 
     // Get teams from active invitations (excluding owned teams)
     const invs = Array.isArray(invitations) ? invitations : []
-    const memberTeams = invs
-      .filter((inv) => inv.status === 'active' && inv.team && !ownedIds.has(inv.team.id))
-      .map((inv) => inv.team as Team)
+    
+    // Deduplicate teams by team.id
+    const memberTeamMap = new Map<string, Team>()
+    invs.forEach((inv) => {
+      if (inv.status === 'active' && inv.team && !ownedIds.has(inv.team.id)) {
+        if (!memberTeamMap.has(inv.team.id)) {
+          memberTeamMap.set(inv.team.id, inv.team as Team)
+        }
+      }
+    })
+    
+    const memberTeams = Array.from(memberTeamMap.values())
 
     return {
       ownedTeamsList: owned,
