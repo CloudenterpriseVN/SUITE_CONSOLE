@@ -1,12 +1,13 @@
+import { useState } from 'react'
 import { z } from 'zod'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
-import { IconMailPlus, IconSend } from '@tabler/icons-react'
-import { Button } from '@/components/ui/button'
-import { useInviteTeamMember } from '@/hooks/use-team'
 import { useQueryClient } from '@tanstack/react-query'
+import { IconMailPlus, IconSend } from '@tabler/icons-react'
 import { toast } from 'sonner'
-import { useState } from 'react'
+import { sendInvitationEmail } from '@/utils/send-invitation-email'
+import { useInviteTeamMember } from '@/hooks/use-team'
+import { Button } from '@/components/ui/button'
 import {
   Dialog,
   DialogClose,
@@ -55,19 +56,28 @@ export function UsersInviteDialog({ open, onOpenChange }: Props) {
   const onSubmit = async (values: UserInviteForm) => {
     setIsInviting(true)
     try {
-      await inviteMember(values.email, values.role)
+      const invitation = await inviteMember(
+        values.email.trim().toLowerCase(),
+        values.role
+      )
 
       // Invalidate queries to refresh member list
       queryClient.invalidateQueries({ queryKey: ['team-members'] })
 
-      toast.success(`Invitation sent to ${values.email}`, {
-        description: 'They can accept it from their Invitations page',
-      })
+      try {
+        await sendInvitationEmail(invitation.email, invitation.id)
+        toast.success(`Đã gửi email mời tới ${invitation.email}`)
+      } catch {
+        toast.error('Đã tạo lời mời nhưng chưa gửi được email', {
+          description: 'Bạn có thể gửi lại từ danh sách thành viên đang chờ.',
+        })
+      }
 
       handleClose()
-    } catch (error: any) {
+    } catch (error: unknown) {
       toast.error('Failed to invite member', {
-        description: error.message || 'An error occurred',
+        description:
+          error instanceof Error ? error.message : 'An error occurred',
       })
     } finally {
       setIsInviting(false)
@@ -87,7 +97,8 @@ export function UsersInviteDialog({ open, onOpenChange }: Props) {
             <IconMailPlus /> Gửi lời mời
           </DialogTitle>
           <DialogDescription>
-            Mời thành viên tham gia nhóm của bạn. Họ có thể chấp thuận lời mời từ mục "Tham gia nhóm".
+            Thành viên sẽ nhận email chứa liên kết xác minh, đặt mật khẩu và
+            tham gia nhóm.
           </DialogDescription>
         </DialogHeader>
 

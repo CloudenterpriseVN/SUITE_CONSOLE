@@ -1,5 +1,5 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { request, requestWithPost, requestWithDelete } from '@/utils/request'
+import { request, requestWithDelete } from '@/utils/request'
 
 export interface Invitation {
   id: string
@@ -27,22 +27,6 @@ export function useInvitations() {
     queryKey: ['invitations'],
     queryFn: async () => {
       return await request<Invitation[]>('/invitations')
-    },
-  })
-}
-
-// Accept invitation
-export function useAcceptInvitation() {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async (invitationId: string) => {
-      return await requestWithPost(`/invitations/${invitationId}/accept`, {})
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['invitations'] })
-      queryClient.invalidateQueries({ queryKey: ['teams'] })
-      queryClient.invalidateQueries({ queryKey: ['app-subscriptions'] })
     },
   })
 }
