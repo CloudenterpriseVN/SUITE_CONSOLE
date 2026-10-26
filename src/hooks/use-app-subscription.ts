@@ -1,7 +1,7 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAtomValue } from 'jotai'
 import { activeTeamIdAtom } from '@/stores/applicationStore'
-import { request, requestWithPost, requestWithPatch } from '@/utils/request'
+import { request, requestWithPost } from '@/utils/request'
 import type { AppPricing, AppSubscription } from '@/types/subscription'
 import type { Invoice } from '@/types/invoice'
 
@@ -112,20 +112,4 @@ export function useCreatePublicInvite() {
   })
 }
 
-// Update subscription status (real API)
-export function useUpdateSubscriptionStatus() {
-  const queryClient = useQueryClient()
-  const activeTeamId = useAtomValue(activeTeamIdAtom)
-
-  return useMutation({
-    mutationFn: async (data: { subscriptionId: string; status: 'registered' | 'active' | 'suspended' }) => {
-      return await requestWithPatch(
-        `/subscriptions/${data.subscriptionId}`,
-        { status: data.status }
-      )
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['app-subscriptions', activeTeamId] })
-    },
-  })
-}
+// Đổi trạng thái subscription chỉ superadmin làm được: xem hooks/use-admin.ts.
