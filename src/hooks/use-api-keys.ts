@@ -1,9 +1,11 @@
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { useAtomValue } from 'jotai'
 import { activeTeamIdAtom, savedAppState } from '@/stores/applicationStore'
-import { request, requestWithPost, requestWithDelete } from '@/utils/request'
+import { request, requestWithPost, requestWithPatch, requestWithDelete } from '@/utils/request'
 import { useTeamSubscriptions } from './use-app-subscription'
-import type { APIKey, CreateAPIKeyResponse, CreateAPIKeyRequest } from '@/types/api-key'
+import type {
+  APIKey, CreateAPIKeyResponse, CreateAPIKeyRequest, TeamAPIKeys, UpdateAPIKeyRequest,
+} from '@/types/api-key'
 
 // Get active subscription based on current team + app context
 export function useActiveSubscription() {
@@ -23,74 +25,43 @@ export function useActiveSubscription() {
   }
 }
 
-// Get all API keys for a subscription
-export function useSubscriptionAPIKeys(subscriptionId: string | undefined) {
+// API key của team: một key cho nhiều app (`apps`), vai trò `admin` | `member`
+export function useTeamAPIKeys() {
+  const teamId = useAtomValue(activeTeamIdAtom)
   return useQuery({
-    queryKey: ['api-keys', subscriptionId],
-    queryFn: async () => {
-      if (!subscriptionId) return []
-      return await request<APIKey[]>(`/subscriptions/${subscriptionId}/api-keys`)
-    },
-    enabled: !!subscriptionId,
+    queryKey: ['api-keys', teamId],
+    queryFn: () => request<TeamAPIKeys>(`/teams/${teamId}/api-keys`),
+    enabled: !!teamId,
   })
 }
 
-// Get API keys for active subscription (uses context)
-export function useActiveSubscriptionAPIKeys() {
-  const { subscriptionId } = useActiveSubscription()
-  return useSubscriptionAPIKeys(subscriptionId)
-}
-
-// Create a new API key
-export function useCreateAPIKey(subscriptionId: string | undefined) {
+function useTeamKeyMutation<P, T>(call: (teamId: string, args: P) => Promise<T>) {
+  const teamId = useAtomValue(activeTeamIdAtom)
   const queryClient = useQueryClient()
-
   return useMutation({
-    mutationFn: async (data: CreateAPIKeyRequest) => {
-      if (!subscriptionId) throw new Error('Subscription ID is required')
-      return await requestWithPost<CreateAPIKeyRequest, CreateAPIKeyResponse>(
-        `/subscriptions/${subscriptionId}/api-keys`,
-        data,
-        {}
-      )
+    mutationFn: async (args: P) => {
+      if (!teamId) throw new Error('Team is required')
+      return await call(teamId, args)
     },
-    onSuccess: () => {
-      // Invalidate and refetch API keys
-      queryClient.invalidateQueries({ queryKey: ['api-keys', subscriptionId] })
-    },
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['api-keys', teamId] }),
   })
 }
 
-// Delete an API key
-export function useDeleteAPIKey(subscriptionId: string | undefined) {
-  const queryClient = useQueryClient()
-
-  return useMutation({
-    mutationFn: async (keyId: string) => {
-      if (!subscriptionId) throw new Error('Subscription ID is required')
-      return await requestWithDelete(`/subscriptions/${subscriptionId}/api-keys/${keyId}`)
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['api-keys', subscriptionId] })
-    },
-  })
+export function useCreateAPIKey() {
+  return useTeamKeyMutation((teamId, data: CreateAPIKeyRequest) =>
+    requestWithPost<CreateAPIKeyRequest, CreateAPIKeyResponse>(`/teams/${teamId}/api-keys`, data, {}))
 }
 
-// Regenerate an API key
-export function useRegenerateAPIKey(subscriptionId: string | undefined) {
-  const queryClient = useQueryClient()
+export function useUpdateAPIKey() {
+  return useTeamKeyMutation((teamId, { id, ...data }: UpdateAPIKeyRequest & { id: string }) =>
+    requestWithPatch<UpdateAPIKeyRequest, APIKey>(`/teams/${teamId}/api-keys/${id}`, data, {}))
+}
 
-  return useMutation({
-    mutationFn: async (keyId: string) => {
-      if (!subscriptionId) throw new Error('Subscription ID is required')
-      return await requestWithPost<{}, CreateAPIKeyResponse>(
-        `/subscriptions/${subscriptionId}/api-keys/${keyId}/regenerate`,
-        {},
-        {}
-      )
-    },
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['api-keys', subscriptionId] })
-    },
-  })
+export function useDeleteAPIKey() {
+  return useTeamKeyMutation((teamId, keyId: string) => requestWithDelete(`/teams/${teamId}/api-keys/${keyId}`))
+}
+
+export function useRegenerateAPIKey() {
+  return useTeamKeyMutation((teamId, keyId: string) =>
+    requestWithPost<Record<string, never>, CreateAPIKeyResponse>(`/teams/${teamId}/api-keys/${keyId}/regenerate`, {}, {}))
 }

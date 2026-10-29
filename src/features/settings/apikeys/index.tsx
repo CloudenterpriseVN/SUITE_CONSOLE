@@ -1,10 +1,12 @@
 import { useState } from 'react'
 import { useAtomValue } from 'jotai'
-import { IconKey, IconPlus, IconTrash, IconRefresh, IconCopy, IconCheck, IconAlertTriangle } from '@tabler/icons-react'
+import { IconKey, IconPlus, IconTrash, IconRefresh, IconCopy, IconCheck, IconAlertTriangle, IconPencil } from '@tabler/icons-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
+import { Checkbox } from '@/components/ui/checkbox'
+import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group'
 import {
   Table,
   TableBody,
@@ -33,25 +35,31 @@ import {
 } from '@/components/ui/alert-dialog'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Card, CardContent } from '@/components/ui/card'
-import { savedAppState } from '@/stores/applicationStore'
+import { activeTeamIdAtom } from '@/stores/applicationStore'
 import {
-  useActiveSubscription,
-  useActiveSubscriptionAPIKeys,
+  useTeamAPIKeys,
   useCreateAPIKey,
+  useUpdateAPIKey,
   useDeleteAPIKey,
   useRegenerateAPIKey,
 } from '@/hooks/use-api-keys'
 import { toast } from 'sonner'
 import { Loader2, AlertCircle } from 'lucide-react'
-import type { CreateAPIKeyResponse } from '@/types/api-key'
+import type { APIKey, APIKeyRole, CreateAPIKeyResponse } from '@/types/api-key'
+
+const ROLE_LABELS: Record<APIKeyRole, string> = { admin: 'Quản trị', member: 'Thành viên' }
 
 export default function APIKeys() {
-  const activeAppCode = useAtomValue(savedAppState)
-  const { subscription, subscriptionId, isLoading: subscriptionLoading, hasSubscription } = useActiveSubscription()
-  const { data: apiKeys, isLoading: keysLoading } = useActiveSubscriptionAPIKeys()
+  const activeTeamId = useAtomValue(activeTeamIdAtom)
+  const { data, isLoading, error: keysError } = useTeamAPIKeys()
+  const apiKeys = data?.keys
+  const teamApps = data?.apps ?? []
 
-  // Dialog states
+  // Dialog states: key đang sửa (null = tạo mới)
   const [createDialogOpen, setCreateDialogOpen] = useState(false)
+  const [editingKey, setEditingKey] = useState<APIKey | null>(null)
+  const [keyApps, setKeyApps] = useState<string[]>([])
+  const [keyRole, setKeyRole] = useState<APIKeyRole>('admin')
   const [createdKey, setCreatedKey] = useState<CreateAPIKeyResponse | null>(null)
   const [deleteKeyId, setDeleteKeyId] = useState<string | null>(null)
   const [regenerateKeyId, setRegenerateKeyId] = useState<string | null>(null)
@@ -60,9 +68,21 @@ export default function APIKeys() {
   const [copied, setCopied] = useState(false)
 
   // Mutations
-  const createAPIKey = useCreateAPIKey(subscriptionId)
-  const deleteAPIKey = useDeleteAPIKey(subscriptionId)
-  const regenerateAPIKey = useRegenerateAPIKey(subscriptionId)
+  const createAPIKey = useCreateAPIKey()
+  const updateAPIKey = useUpdateAPIKey()
+  const deleteAPIKey = useDeleteAPIKey()
+  const regenerateAPIKey = useRegenerateAPIKey()
+
+  const openKeyDialog = (key: APIKey | null) => {
+    setEditingKey(key)
+    setKeyName(key?.name ?? '')
+    setKeyApps(key ? key.apps : teamApps.map((a) => a.app))
+    setKeyRole(key?.role ?? 'admin')
+    setCreateDialogOpen(true)
+  }
+
+  const toggleApp = (app: string, checked: boolean) =>
+    setKeyApps((apps) => (checked ? [...apps, app] : apps.filter((a) => a !== app)))
 
   const handleCreateKey = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -70,15 +90,24 @@ export default function APIKeys() {
       toast.error('Please enter a name for the API key')
       return
     }
+    if (!keyApps.length) {
+      toast.error('Chọn ít nhất một ứng dụng')
+      return
+    }
 
+    const values = { name: keyName.trim(), apps: keyApps, role: keyRole }
     try {
-      const response = await createAPIKey.mutateAsync({ name: keyName.trim() })
+      if (editingKey) {
+        await updateAPIKey.mutateAsync({ id: editingKey.id, ...values })
+        toast.success('Đã lưu API key')
+      } else {
+        setCreatedKey(await createAPIKey.mutateAsync(values))
+        toast.success('API key created successfully')
+      }
       setKeyName('')
       setCreateDialogOpen(false)
-      setCreatedKey(response)
-      toast.success('API key created successfully')
     } catch (error: any) {
-      toast.error('Failed to create API key', {
+      toast.error(editingKey ? 'Không lưu được API key' : 'Failed to create API key', {
         description: error.message || 'An error occurred',
       })
     }
@@ -129,48 +158,47 @@ export default function APIKeys() {
     toast.success('Key prefix copied to clipboard')
   }
 
-  const isLoading = subscriptionLoading || keysLoading
-
-  // No active app selected
-  if (!activeAppCode) {
+  // No active team selected
+  if (!activeTeamId) {
     return (
       <div className='flex-1 w-full'>
         <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>API Keys</h2>
             <p className='text-muted-foreground'>
-              Sử dụng các key này để tích hợp với ứng dụng qua REST API
+              Một key của team dùng cho mọi ứng dụng được chọn (vd Odoo kết nối Suite Shop và Suite WMS)
             </p>
           </div>
         </div>
         <Card className="mt-6">
           <CardContent className="flex flex-col items-center justify-center h-48 text-center">
             <AlertCircle className="h-10 w-10 text-muted-foreground mb-4" />
-            <p className="text-muted-foreground">Please select an app first</p>
-            <p className="text-sm text-muted-foreground">Use the app selector in the header to choose an app</p>
+            <p className="text-muted-foreground">Chọn team trước</p>
           </CardContent>
         </Card>
       </div>
     )
   }
 
-  // No subscription for this app
-  if (!isLoading && !hasSubscription) {
+  // Không quản lý được app nào của team (không phải chủ team / admin, hoặc team chưa đăng ký app)
+  if (!isLoading && (keysError || !teamApps.length)) {
     return (
       <div className='flex-1 w-full'>
         <div className='mb-2 flex flex-wrap items-center justify-between space-y-2'>
           <div>
             <h2 className='text-2xl font-bold tracking-tight'>API Keys</h2>
             <p className='text-muted-foreground'>
-              Sử dụng các key này để tích hợp với ứng dụng qua REST API
+              Một key của team dùng cho mọi ứng dụng được chọn (vd Odoo kết nối Suite Shop và Suite WMS)
             </p>
           </div>
         </div>
         <Card className="mt-6">
           <CardContent className="flex flex-col items-center justify-center h-48 text-center">
             <AlertCircle className="h-10 w-10 text-yellow-500 mb-4" />
-            <p className="text-muted-foreground">No subscription found for this app</p>
-            <p className="text-sm text-muted-foreground">Subscribe to the app first to manage API keys</p>
+            <p className="text-muted-foreground">Không có ứng dụng nào để cấp API key</p>
+            <p className="text-sm text-muted-foreground">
+              Cần là chủ team hoặc quản trị của ít nhất một ứng dụng team đã đăng ký
+            </p>
           </CardContent>
         </Card>
       </div>
@@ -186,7 +214,7 @@ export default function APIKeys() {
             Sử dụng các key này để tích hợp với ứng dụng qua REST API
           </p>
         </div>
-        <Button onClick={() => setCreateDialogOpen(true)} disabled={!hasSubscription}>
+        <Button onClick={() => openKeyDialog(null)}>
           <IconPlus className="mr-2 h-4 w-4" />
           Tạo API Key
         </Button>
@@ -214,6 +242,8 @@ export default function APIKeys() {
                   <TableRow>
                     <TableHead>Name</TableHead>
                     <TableHead>Key</TableHead>
+                    <TableHead>Ứng dụng</TableHead>
+                    <TableHead>Vai trò</TableHead>
                     <TableHead>Status</TableHead>
                     <TableHead>Created</TableHead>
                     <TableHead className="text-right">Actions</TableHead>
@@ -239,6 +269,14 @@ export default function APIKeys() {
                         </div>
                       </TableCell>
                       <TableCell>
+                        <div className="flex flex-wrap gap-1">
+                          {key.apps.map((app) => (
+                            <Badge key={app} variant="outline" className="uppercase">{app}</Badge>
+                          ))}
+                        </div>
+                      </TableCell>
+                      <TableCell>{ROLE_LABELS[key.role] ?? key.role}</TableCell>
+                      <TableCell>
                         <Badge variant={key.status === 'active' ? 'default' : 'destructive'}>
                           {key.status}
                         </Badge>
@@ -248,6 +286,15 @@ export default function APIKeys() {
                       </TableCell>
                       <TableCell className="text-right">
                         <div className="flex items-center justify-end gap-1">
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            className="h-8 w-8"
+                            onClick={() => openKeyDialog(key)}
+                            title="Sửa phạm vi"
+                          >
+                            <IconPencil className="h-4 w-4" />
+                          </Button>
                           <Button
                             variant="ghost"
                             size="icon"
@@ -290,13 +337,18 @@ export default function APIKeys() {
       {/* Create API Key Dialog */}
       <Dialog open={createDialogOpen} onOpenChange={(open) => {
         setCreateDialogOpen(open)
-        if (!open) setKeyName('')
+        if (!open) {
+          setKeyName('')
+          setEditingKey(null)
+        }
       }}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Tạo API Key</DialogTitle>
+            <DialogTitle>{editingKey ? 'Sửa API Key' : 'Tạo API Key'}</DialogTitle>
             <DialogDescription>
-              Tạo API key cho {subscription?.app_code || activeAppCode}. Không hiển thị lại nên hãy lưu thông tin cẩn thận.
+              {editingKey
+                ? 'Đổi tên, ứng dụng và vai trò của key. Key không đổi.'
+                : 'Key của team, dùng cho các ứng dụng được chọn. Key chỉ hiện một lần nên hãy lưu cẩn thận.'}
             </DialogDescription>
           </DialogHeader>
           <form onSubmit={handleCreateKey}>
@@ -314,19 +366,45 @@ export default function APIKeys() {
                   Đăt tên để dễ nhớ về sau.
                 </p>
               </div>
+              <div className="grid gap-2">
+                <Label>Ứng dụng</Label>
+                <div className="flex flex-wrap gap-4">
+                  {teamApps.map(({ app, status }) => (
+                    <label key={app} className="flex items-center gap-2 text-sm">
+                      <Checkbox
+                        checked={keyApps.includes(app)}
+                        onCheckedChange={(checked) => toggleApp(app, checked === true)}
+                      />
+                      <span className="uppercase">{app}</span>
+                      {status !== 'active' && <span className="text-muted-foreground">({status})</span>}
+                    </label>
+                  ))}
+                </div>
+              </div>
+              <div className="grid gap-2">
+                <Label>Vai trò</Label>
+                <RadioGroup value={keyRole} onValueChange={(v) => setKeyRole(v as APIKeyRole)} className="flex gap-4">
+                  {(Object.keys(ROLE_LABELS) as APIKeyRole[]).map((role) => (
+                    <label key={role} className="flex items-center gap-2 text-sm">
+                      <RadioGroupItem value={role} />
+                      {ROLE_LABELS[role]}
+                    </label>
+                  ))}
+                </RadioGroup>
+              </div>
             </div>
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setCreateDialogOpen(false)}>
                 Hủy
               </Button>
-              <Button type="submit" disabled={createAPIKey.isPending}>
-                {createAPIKey.isPending ? (
+              <Button type="submit" disabled={createAPIKey.isPending || updateAPIKey.isPending}>
+                {createAPIKey.isPending || updateAPIKey.isPending ? (
                   <>
                     <Loader2 className="mr-2 h-4 w-4 animate-spin" />
                     Đang khởi tạo...
                   </>
                 ) : (
-                  'Tạo khóa mới'
+                  editingKey ? 'Lưu' : 'Tạo khóa mới'
                 )}
               </Button>
             </DialogFooter>
