@@ -29,12 +29,12 @@ import { Route as AuthenticatedSettingsRouteRouteImport } from './routes/_authen
 import { Route as AuthenticatedUsersIndexRouteImport } from './routes/_authenticated/users/index'
 import { Route as AuthenticatedTasksIndexRouteImport } from './routes/_authenticated/tasks/index'
 import { Route as AuthenticatedSettingsIndexRouteImport } from './routes/_authenticated/settings/index'
-import { Route as AuthenticatedInvitationsIndexRouteImport } from './routes/_authenticated/invitations/index'
 import { Route as AuthenticatedHelpCenterIndexRouteImport } from './routes/_authenticated/help-center/index'
 import { Route as AuthenticatedDashboardIndexRouteImport } from './routes/_authenticated/dashboard/index'
 import { Route as AuthenticatedChatsIndexRouteImport } from './routes/_authenticated/chats/index'
 import { Route as AuthenticatedBillingIndexRouteImport } from './routes/_authenticated/billing/index'
 import { Route as AuthenticatedAppsIndexRouteImport } from './routes/_authenticated/apps/index'
+import { Route as AuthenticatedApiKeysIndexRouteImport } from './routes/_authenticated/api-keys/index'
 import { Route as AuthenticatedAdminIndexRouteImport } from './routes/_authenticated/admin/index'
 import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/clerk/_authenticated/user-management'
 import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-up'
@@ -43,7 +43,6 @@ import { Route as AuthenticatedTeamMembersRouteImport } from './routes/_authenti
 import { Route as AuthenticatedSettingsWebhooksRouteImport } from './routes/_authenticated/settings/webhooks'
 import { Route as AuthenticatedSettingsOdooRouteImport } from './routes/_authenticated/settings/odoo'
 import { Route as AuthenticatedSettingsFeedRouteImport } from './routes/_authenticated/settings/feed'
-import { Route as AuthenticatedSettingsApikeysRouteImport } from './routes/_authenticated/settings/apikeys'
 import { Route as AuthenticatedAdminSubscriptionsRouteImport } from './routes/_authenticated/admin/subscriptions'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminAppsRouteImport } from './routes/_authenticated/admin/apps'
@@ -147,12 +146,6 @@ const AuthenticatedSettingsIndexRoute =
     path: '/',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
-const AuthenticatedInvitationsIndexRoute =
-  AuthenticatedInvitationsIndexRouteImport.update({
-    id: '/invitations/',
-    path: '/invitations/',
-    getParentRoute: () => AuthenticatedRouteRoute,
-  } as any)
 const AuthenticatedHelpCenterIndexRoute =
   AuthenticatedHelpCenterIndexRouteImport.update({
     id: '/help-center/',
@@ -181,6 +174,12 @@ const AuthenticatedAppsIndexRoute = AuthenticatedAppsIndexRouteImport.update({
   path: '/apps/',
   getParentRoute: () => AuthenticatedRouteRoute,
 } as any)
+const AuthenticatedApiKeysIndexRoute =
+  AuthenticatedApiKeysIndexRouteImport.update({
+    id: '/api-keys/',
+    path: '/api-keys/',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminIndexRoute = AuthenticatedAdminIndexRouteImport.update({
   id: '/admin/',
   path: '/admin/',
@@ -226,12 +225,6 @@ const AuthenticatedSettingsFeedRoute =
     path: '/feed',
     getParentRoute: () => AuthenticatedSettingsRouteRoute,
   } as any)
-const AuthenticatedSettingsApikeysRoute =
-  AuthenticatedSettingsApikeysRouteImport.update({
-    id: '/apikeys',
-    path: '/apikeys',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
-  } as any)
 const AuthenticatedAdminSubscriptionsRoute =
   AuthenticatedAdminSubscriptionsRouteImport.update({
     id: '/admin/subscriptions',
@@ -268,7 +261,6 @@ export interface FileRoutesByFullPath {
   '/admin/apps': typeof AuthenticatedAdminAppsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
-  '/settings/apikeys': typeof AuthenticatedSettingsApikeysRoute
   '/settings/feed': typeof AuthenticatedSettingsFeedRoute
   '/settings/odoo': typeof AuthenticatedSettingsOdooRoute
   '/settings/webhooks': typeof AuthenticatedSettingsWebhooksRoute
@@ -277,12 +269,12 @@ export interface FileRoutesByFullPath {
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api-keys': typeof AuthenticatedApiKeysIndexRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/billing': typeof AuthenticatedBillingIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
-  '/invitations': typeof AuthenticatedInvitationsIndexRoute
   '/settings/': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
@@ -304,7 +296,6 @@ export interface FileRoutesByTo {
   '/admin/apps': typeof AuthenticatedAdminAppsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
-  '/settings/apikeys': typeof AuthenticatedSettingsApikeysRoute
   '/settings/feed': typeof AuthenticatedSettingsFeedRoute
   '/settings/odoo': typeof AuthenticatedSettingsOdooRoute
   '/settings/webhooks': typeof AuthenticatedSettingsWebhooksRoute
@@ -313,12 +304,12 @@ export interface FileRoutesByTo {
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/admin': typeof AuthenticatedAdminIndexRoute
+  '/api-keys': typeof AuthenticatedApiKeysIndexRoute
   '/apps': typeof AuthenticatedAppsIndexRoute
   '/billing': typeof AuthenticatedBillingIndexRoute
   '/chats': typeof AuthenticatedChatsIndexRoute
   '/dashboard': typeof AuthenticatedDashboardIndexRoute
   '/help-center': typeof AuthenticatedHelpCenterIndexRoute
-  '/invitations': typeof AuthenticatedInvitationsIndexRoute
   '/settings': typeof AuthenticatedSettingsIndexRoute
   '/tasks': typeof AuthenticatedTasksIndexRoute
   '/users': typeof AuthenticatedUsersIndexRoute
@@ -345,7 +336,6 @@ export interface FileRoutesById {
   '/_authenticated/admin/apps': typeof AuthenticatedAdminAppsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
-  '/_authenticated/settings/apikeys': typeof AuthenticatedSettingsApikeysRoute
   '/_authenticated/settings/feed': typeof AuthenticatedSettingsFeedRoute
   '/_authenticated/settings/odoo': typeof AuthenticatedSettingsOdooRoute
   '/_authenticated/settings/webhooks': typeof AuthenticatedSettingsWebhooksRoute
@@ -354,12 +344,12 @@ export interface FileRoutesById {
   '/clerk/(auth)/sign-up': typeof ClerkauthSignUpRoute
   '/clerk/_authenticated/user-management': typeof ClerkAuthenticatedUserManagementRoute
   '/_authenticated/admin/': typeof AuthenticatedAdminIndexRoute
+  '/_authenticated/api-keys/': typeof AuthenticatedApiKeysIndexRoute
   '/_authenticated/apps/': typeof AuthenticatedAppsIndexRoute
   '/_authenticated/billing/': typeof AuthenticatedBillingIndexRoute
   '/_authenticated/chats/': typeof AuthenticatedChatsIndexRoute
   '/_authenticated/dashboard/': typeof AuthenticatedDashboardIndexRoute
   '/_authenticated/help-center/': typeof AuthenticatedHelpCenterIndexRoute
-  '/_authenticated/invitations/': typeof AuthenticatedInvitationsIndexRoute
   '/_authenticated/settings/': typeof AuthenticatedSettingsIndexRoute
   '/_authenticated/tasks/': typeof AuthenticatedTasksIndexRoute
   '/_authenticated/users/': typeof AuthenticatedUsersIndexRoute
@@ -385,7 +375,6 @@ export interface FileRouteTypes {
     | '/admin/apps'
     | '/admin/audit'
     | '/admin/subscriptions'
-    | '/settings/apikeys'
     | '/settings/feed'
     | '/settings/odoo'
     | '/settings/webhooks'
@@ -394,12 +383,12 @@ export interface FileRouteTypes {
     | '/clerk/sign-up'
     | '/clerk/user-management'
     | '/admin'
+    | '/api-keys'
     | '/apps'
     | '/billing'
     | '/chats'
     | '/dashboard'
     | '/help-center'
-    | '/invitations'
     | '/settings/'
     | '/tasks'
     | '/users'
@@ -421,7 +410,6 @@ export interface FileRouteTypes {
     | '/admin/apps'
     | '/admin/audit'
     | '/admin/subscriptions'
-    | '/settings/apikeys'
     | '/settings/feed'
     | '/settings/odoo'
     | '/settings/webhooks'
@@ -430,12 +418,12 @@ export interface FileRouteTypes {
     | '/clerk/sign-up'
     | '/clerk/user-management'
     | '/admin'
+    | '/api-keys'
     | '/apps'
     | '/billing'
     | '/chats'
     | '/dashboard'
     | '/help-center'
-    | '/invitations'
     | '/settings'
     | '/tasks'
     | '/users'
@@ -461,7 +449,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/apps'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/subscriptions'
-    | '/_authenticated/settings/apikeys'
     | '/_authenticated/settings/feed'
     | '/_authenticated/settings/odoo'
     | '/_authenticated/settings/webhooks'
@@ -470,12 +457,12 @@ export interface FileRouteTypes {
     | '/clerk/(auth)/sign-up'
     | '/clerk/_authenticated/user-management'
     | '/_authenticated/admin/'
+    | '/_authenticated/api-keys/'
     | '/_authenticated/apps/'
     | '/_authenticated/billing/'
     | '/_authenticated/chats/'
     | '/_authenticated/dashboard/'
     | '/_authenticated/help-center/'
-    | '/_authenticated/invitations/'
     | '/_authenticated/settings/'
     | '/_authenticated/tasks/'
     | '/_authenticated/users/'
@@ -639,13 +626,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsIndexRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
-    '/_authenticated/invitations/': {
-      id: '/_authenticated/invitations/'
-      path: '/invitations'
-      fullPath: '/invitations'
-      preLoaderRoute: typeof AuthenticatedInvitationsIndexRouteImport
-      parentRoute: typeof AuthenticatedRouteRoute
-    }
     '/_authenticated/help-center/': {
       id: '/_authenticated/help-center/'
       path: '/help-center'
@@ -679,6 +659,13 @@ declare module '@tanstack/react-router' {
       path: '/apps'
       fullPath: '/apps'
       preLoaderRoute: typeof AuthenticatedAppsIndexRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
+    '/_authenticated/api-keys/': {
+      id: '/_authenticated/api-keys/'
+      path: '/api-keys'
+      fullPath: '/api-keys'
+      preLoaderRoute: typeof AuthenticatedApiKeysIndexRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
     '/_authenticated/admin/': {
@@ -737,13 +724,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedSettingsFeedRouteImport
       parentRoute: typeof AuthenticatedSettingsRouteRoute
     }
-    '/_authenticated/settings/apikeys': {
-      id: '/_authenticated/settings/apikeys'
-      path: '/apikeys'
-      fullPath: '/settings/apikeys'
-      preLoaderRoute: typeof AuthenticatedSettingsApikeysRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
-    }
     '/_authenticated/admin/subscriptions': {
       id: '/_authenticated/admin/subscriptions'
       path: '/admin/subscriptions'
@@ -769,7 +749,6 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedSettingsRouteRouteChildren {
-  AuthenticatedSettingsApikeysRoute: typeof AuthenticatedSettingsApikeysRoute
   AuthenticatedSettingsFeedRoute: typeof AuthenticatedSettingsFeedRoute
   AuthenticatedSettingsOdooRoute: typeof AuthenticatedSettingsOdooRoute
   AuthenticatedSettingsWebhooksRoute: typeof AuthenticatedSettingsWebhooksRoute
@@ -778,7 +757,6 @@ interface AuthenticatedSettingsRouteRouteChildren {
 
 const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteChildren =
   {
-    AuthenticatedSettingsApikeysRoute: AuthenticatedSettingsApikeysRoute,
     AuthenticatedSettingsFeedRoute: AuthenticatedSettingsFeedRoute,
     AuthenticatedSettingsOdooRoute: AuthenticatedSettingsOdooRoute,
     AuthenticatedSettingsWebhooksRoute: AuthenticatedSettingsWebhooksRoute,
@@ -798,12 +776,12 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedAdminSubscriptionsRoute: typeof AuthenticatedAdminSubscriptionsRoute
   AuthenticatedTeamMembersRoute: typeof AuthenticatedTeamMembersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
+  AuthenticatedApiKeysIndexRoute: typeof AuthenticatedApiKeysIndexRoute
   AuthenticatedAppsIndexRoute: typeof AuthenticatedAppsIndexRoute
   AuthenticatedBillingIndexRoute: typeof AuthenticatedBillingIndexRoute
   AuthenticatedChatsIndexRoute: typeof AuthenticatedChatsIndexRoute
   AuthenticatedDashboardIndexRoute: typeof AuthenticatedDashboardIndexRoute
   AuthenticatedHelpCenterIndexRoute: typeof AuthenticatedHelpCenterIndexRoute
-  AuthenticatedInvitationsIndexRoute: typeof AuthenticatedInvitationsIndexRoute
   AuthenticatedTasksIndexRoute: typeof AuthenticatedTasksIndexRoute
   AuthenticatedUsersIndexRoute: typeof AuthenticatedUsersIndexRoute
 }
@@ -816,12 +794,12 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedAdminSubscriptionsRoute: AuthenticatedAdminSubscriptionsRoute,
   AuthenticatedTeamMembersRoute: AuthenticatedTeamMembersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,
+  AuthenticatedApiKeysIndexRoute: AuthenticatedApiKeysIndexRoute,
   AuthenticatedAppsIndexRoute: AuthenticatedAppsIndexRoute,
   AuthenticatedBillingIndexRoute: AuthenticatedBillingIndexRoute,
   AuthenticatedChatsIndexRoute: AuthenticatedChatsIndexRoute,
   AuthenticatedDashboardIndexRoute: AuthenticatedDashboardIndexRoute,
   AuthenticatedHelpCenterIndexRoute: AuthenticatedHelpCenterIndexRoute,
-  AuthenticatedInvitationsIndexRoute: AuthenticatedInvitationsIndexRoute,
   AuthenticatedTasksIndexRoute: AuthenticatedTasksIndexRoute,
   AuthenticatedUsersIndexRoute: AuthenticatedUsersIndexRoute,
 }

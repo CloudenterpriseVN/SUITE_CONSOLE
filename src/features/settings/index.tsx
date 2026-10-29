@@ -5,7 +5,6 @@ import {
   IconDatabase,
   IconNotification,
   IconPalette,
-  IconTool,
   IconUser,
 } from '@tabler/icons-react'
 import { Separator } from '@/components/ui/separator'
@@ -56,11 +55,6 @@ const sidebarNavItems = [
     title: 'Thành viên',
     icon: <IconUser size={18} />,
     href: '/settings',
-  },
-  {
-    title: 'API Keys',
-    icon: <IconTool size={18} />,
-    href: '/settings/apikeys',
   },
   {
     title: 'Odoo',
