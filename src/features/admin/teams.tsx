@@ -35,6 +35,7 @@ import {
 } from './components/status'
 import {
   CreateTeamDialog,
+  RetentionDialog,
   SubscribeForTeamDialog,
   TransferOwnerDialog,
 } from './components/team-dialogs'
@@ -229,6 +230,7 @@ function TeamSheet({
   const [pinning, setPinning] = useState<AdminSubscription | null>(null)
   const [transferring, setTransferring] = useState(false)
   const [subscribing, setSubscribing] = useState(false)
+  const [retention, setRetention] = useState(false)
   const { data: apps } = useAdminApps()
 
   const run = async (status: string, reason: string) => {
@@ -264,6 +266,19 @@ function TeamSheet({
               <dd>{formatTime(team.create_at)}</dd>
               <dt className='text-muted-foreground'>Mã team</dt>
               <dd className='font-mono text-xs'>{team.id}</dd>
+              <dt className='text-muted-foreground'>Lưu giao dịch</dt>
+              <dd>
+                {team.retention_effective ?? 90} ngày
+                {team.retention_days == null ? ' (mặc định)' : ' (riêng)'}
+                <Button
+                  size='sm'
+                  variant='link'
+                  className='h-auto px-2 py-0'
+                  onClick={() => setRetention(true)}
+                >
+                  Sửa
+                </Button>
+              </dd>
             </dl>
             {team.status === 'closed' && <StatusBadge status='closed' />}
             <div className='flex flex-wrap gap-2'>
@@ -347,6 +362,15 @@ function TeamSheet({
             teamName={team.name ?? team.id}
             currentOwner={team.owner}
             onClose={() => setTransferring(false)}
+          />
+        )}
+        {retention && team && (
+          <RetentionDialog
+            teamId={team.id}
+            teamName={team.name ?? team.id}
+            current={team.retention_days}
+            effective={team.retention_effective}
+            onClose={() => setRetention(false)}
           />
         )}
         {subscribing && team && apps && (

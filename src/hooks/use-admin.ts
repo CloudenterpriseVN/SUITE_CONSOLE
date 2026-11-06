@@ -85,6 +85,10 @@ export interface NewAppVersion {
 
 export interface AdminTeamDetail extends AdminTeamSummary {
   billing_address?: string
+  /** Số ngày giữ giao dịch đã hoàn thành, riêng của team; null = mặc định nền tảng */
+  retention_days?: number | null
+  /** Số ngày thực dụng (riêng hoặc mặc định) */
+  retention_effective?: number
   subscriptions: AdminSubscription[]
 }
 
@@ -228,6 +232,25 @@ export function useTransferOwner() {
         `/admin/teams/${data.teamId}/owner`,
         { owner: data.owner, reason: data.reason }
       ),
+    onSuccess: () => invalidateAdmin(queryClient),
+  })
+}
+
+export function useSetRetention() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: {
+      teamId: string
+      retention_days: number | null
+      reason?: string
+    }) =>
+      requestWithPatch<
+        { retention_days: number | null; reason?: string },
+        AdminTeamDetail
+      >(`/admin/teams/${data.teamId}`, {
+        retention_days: data.retention_days,
+        reason: data.reason,
+      }),
     onSuccess: () => invalidateAdmin(queryClient),
   })
 }

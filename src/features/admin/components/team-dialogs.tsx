@@ -5,6 +5,7 @@ import {
   type NewTeam,
   SUGGESTED_STATUSES,
   useCreateTeam,
+  useSetRetention,
   useSubscribeForTeam,
   useTransferOwner,
 } from '@/hooks/use-admin'
@@ -175,6 +176,96 @@ export function TransferOwnerDialog({
             }
           >
             Chuyển chủ
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+export function RetentionDialog({
+  teamId,
+  teamName,
+  current,
+  effective,
+  onClose,
+}: {
+  teamId: string
+  teamName: string
+  current: number | null | undefined
+  effective: number | undefined
+  onClose: () => void
+}) {
+  const set = useSetRetention()
+  const [useDefault, setUseDefault] = useState(current == null)
+  const [days, setDays] = useState(String(current ?? effective ?? 90))
+  const [reason, setReason] = useState('')
+  const n = Number(days)
+  const valid = useDefault || (Number.isInteger(n) && n >= 7 && n <= 730)
+  const value = useDefault ? null : n
+  const same = value === (current ?? null)
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Thời hạn lưu giao dịch — {teamName}</DialogTitle>
+          <DialogDescription>
+            Giao dịch đã hoàn thành (ca đã đóng / ERP đã nhận, đơn DMS xong,
+            phiếu WMS đã nhập) bị xoá khỏi mọi ứng dụng sau số ngày này. Chỉ áp
+            cho giao dịch hoàn thành từ nay; dữ liệu đã có cần chạy backfill.
+          </DialogDescription>
+        </DialogHeader>
+        <Select
+          value={useDefault ? 'default' : 'custom'}
+          onValueChange={(v) => setUseDefault(v === 'default')}
+        >
+          <SelectTrigger>
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value='default'>
+              Mặc định nền tảng ({effective ?? 90} ngày)
+            </SelectItem>
+            <SelectItem value='custom'>Riêng cho team</SelectItem>
+          </SelectContent>
+        </Select>
+        {!useDefault && (
+          <div className='grid gap-1.5'>
+            <Label htmlFor='retention-days'>Số ngày (7–730)</Label>
+            <Input
+              id='retention-days'
+              type='number'
+              min={7}
+              max={730}
+              value={days}
+              onChange={(e) => setDays(e.target.value)}
+            />
+          </div>
+        )}
+        <Textarea
+          placeholder='Lý do (không bắt buộc)'
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+        />
+        <DialogFooter>
+          <Button variant='outline' onClick={onClose}>
+            Huỷ
+          </Button>
+          <Button
+            disabled={!valid || same || set.isPending}
+            onClick={() =>
+              attempt(
+                () =>
+                  set.mutateAsync({ teamId, retention_days: value, reason }),
+                value == null
+                  ? 'Đã dùng mặc định nền tảng'
+                  : `Đã đặt ${value} ngày`,
+                onClose
+              )
+            }
+          >
+            Lưu
           </Button>
         </DialogFooter>
       </DialogContent>
