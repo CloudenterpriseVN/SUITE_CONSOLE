@@ -40,9 +40,6 @@ import { Route as ClerkAuthenticatedUserManagementRouteImport } from './routes/c
 import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-up'
 import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-in'
 import { Route as AuthenticatedTeamMembersRouteImport } from './routes/_authenticated/team/members'
-import { Route as AuthenticatedSettingsWebhooksRouteImport } from './routes/_authenticated/settings/webhooks'
-import { Route as AuthenticatedSettingsOdooRouteImport } from './routes/_authenticated/settings/odoo'
-import { Route as AuthenticatedSettingsFeedRouteImport } from './routes/_authenticated/settings/feed'
 import { Route as AuthenticatedAdminSubscriptionsRouteImport } from './routes/_authenticated/admin/subscriptions'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminAppsRouteImport } from './routes/_authenticated/admin/apps'
@@ -207,24 +204,6 @@ const AuthenticatedTeamMembersRoute =
     path: '/team/members',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
-const AuthenticatedSettingsWebhooksRoute =
-  AuthenticatedSettingsWebhooksRouteImport.update({
-    id: '/webhooks',
-    path: '/webhooks',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
-  } as any)
-const AuthenticatedSettingsOdooRoute =
-  AuthenticatedSettingsOdooRouteImport.update({
-    id: '/odoo',
-    path: '/odoo',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
-  } as any)
-const AuthenticatedSettingsFeedRoute =
-  AuthenticatedSettingsFeedRouteImport.update({
-    id: '/feed',
-    path: '/feed',
-    getParentRoute: () => AuthenticatedSettingsRouteRoute,
-  } as any)
 const AuthenticatedAdminSubscriptionsRoute =
   AuthenticatedAdminSubscriptionsRouteImport.update({
     id: '/admin/subscriptions',
@@ -261,9 +240,6 @@ export interface FileRoutesByFullPath {
   '/admin/apps': typeof AuthenticatedAdminAppsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
-  '/settings/feed': typeof AuthenticatedSettingsFeedRoute
-  '/settings/odoo': typeof AuthenticatedSettingsOdooRoute
-  '/settings/webhooks': typeof AuthenticatedSettingsWebhooksRoute
   '/team/members': typeof AuthenticatedTeamMembersRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
@@ -296,9 +272,6 @@ export interface FileRoutesByTo {
   '/admin/apps': typeof AuthenticatedAdminAppsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
-  '/settings/feed': typeof AuthenticatedSettingsFeedRoute
-  '/settings/odoo': typeof AuthenticatedSettingsOdooRoute
-  '/settings/webhooks': typeof AuthenticatedSettingsWebhooksRoute
   '/team/members': typeof AuthenticatedTeamMembersRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
   '/clerk/sign-up': typeof ClerkauthSignUpRoute
@@ -336,9 +309,6 @@ export interface FileRoutesById {
   '/_authenticated/admin/apps': typeof AuthenticatedAdminAppsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
   '/_authenticated/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
-  '/_authenticated/settings/feed': typeof AuthenticatedSettingsFeedRoute
-  '/_authenticated/settings/odoo': typeof AuthenticatedSettingsOdooRoute
-  '/_authenticated/settings/webhooks': typeof AuthenticatedSettingsWebhooksRoute
   '/_authenticated/team/members': typeof AuthenticatedTeamMembersRoute
   '/clerk/(auth)/sign-in': typeof ClerkauthSignInRoute
   '/clerk/(auth)/sign-up': typeof ClerkauthSignUpRoute
@@ -375,9 +345,6 @@ export interface FileRouteTypes {
     | '/admin/apps'
     | '/admin/audit'
     | '/admin/subscriptions'
-    | '/settings/feed'
-    | '/settings/odoo'
-    | '/settings/webhooks'
     | '/team/members'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
@@ -410,9 +377,6 @@ export interface FileRouteTypes {
     | '/admin/apps'
     | '/admin/audit'
     | '/admin/subscriptions'
-    | '/settings/feed'
-    | '/settings/odoo'
-    | '/settings/webhooks'
     | '/team/members'
     | '/clerk/sign-in'
     | '/clerk/sign-up'
@@ -449,9 +413,6 @@ export interface FileRouteTypes {
     | '/_authenticated/admin/apps'
     | '/_authenticated/admin/audit'
     | '/_authenticated/admin/subscriptions'
-    | '/_authenticated/settings/feed'
-    | '/_authenticated/settings/odoo'
-    | '/_authenticated/settings/webhooks'
     | '/_authenticated/team/members'
     | '/clerk/(auth)/sign-in'
     | '/clerk/(auth)/sign-up'
@@ -703,27 +664,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTeamMembersRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
-    '/_authenticated/settings/webhooks': {
-      id: '/_authenticated/settings/webhooks'
-      path: '/webhooks'
-      fullPath: '/settings/webhooks'
-      preLoaderRoute: typeof AuthenticatedSettingsWebhooksRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
-    }
-    '/_authenticated/settings/odoo': {
-      id: '/_authenticated/settings/odoo'
-      path: '/odoo'
-      fullPath: '/settings/odoo'
-      preLoaderRoute: typeof AuthenticatedSettingsOdooRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
-    }
-    '/_authenticated/settings/feed': {
-      id: '/_authenticated/settings/feed'
-      path: '/feed'
-      fullPath: '/settings/feed'
-      preLoaderRoute: typeof AuthenticatedSettingsFeedRouteImport
-      parentRoute: typeof AuthenticatedSettingsRouteRoute
-    }
     '/_authenticated/admin/subscriptions': {
       id: '/_authenticated/admin/subscriptions'
       path: '/admin/subscriptions'
@@ -749,17 +689,11 @@ declare module '@tanstack/react-router' {
 }
 
 interface AuthenticatedSettingsRouteRouteChildren {
-  AuthenticatedSettingsFeedRoute: typeof AuthenticatedSettingsFeedRoute
-  AuthenticatedSettingsOdooRoute: typeof AuthenticatedSettingsOdooRoute
-  AuthenticatedSettingsWebhooksRoute: typeof AuthenticatedSettingsWebhooksRoute
   AuthenticatedSettingsIndexRoute: typeof AuthenticatedSettingsIndexRoute
 }
 
 const AuthenticatedSettingsRouteRouteChildren: AuthenticatedSettingsRouteRouteChildren =
   {
-    AuthenticatedSettingsFeedRoute: AuthenticatedSettingsFeedRoute,
-    AuthenticatedSettingsOdooRoute: AuthenticatedSettingsOdooRoute,
-    AuthenticatedSettingsWebhooksRoute: AuthenticatedSettingsWebhooksRoute,
     AuthenticatedSettingsIndexRoute: AuthenticatedSettingsIndexRoute,
   }
 

@@ -1,12 +1,5 @@
 import { Outlet } from '@tanstack/react-router'
-import {
-  IconApi,
-  IconBrowserCheck,
-  IconDatabase,
-  IconNotification,
-  IconPalette,
-  IconUser,
-} from '@tabler/icons-react'
+import { IconUser } from '@tabler/icons-react'
 import { Separator } from '@/components/ui/separator'
 import { Header } from '@/components/layout/header'
 import { Main } from '@/components/layout/main'
@@ -55,20 +48,5 @@ const sidebarNavItems = [
     title: 'Thành viên',
     icon: <IconUser size={18} />,
     href: '/settings',
-  },
-  {
-    title: 'Odoo',
-    icon: <IconDatabase size={18} />,
-    href: '/settings/odoo',
-  },
-  {
-    title: 'Feeding API',
-    icon: <IconApi size={18} />,
-    href: '/settings/feed',
-  },
-  {
-    title: 'Webhooks',
-    icon: <IconPalette size={18} />,
-    href: '/settings/webhooks',
   },
 ]
