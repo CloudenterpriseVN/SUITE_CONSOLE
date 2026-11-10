@@ -82,7 +82,7 @@ function AcceptInvitation() {
         `invitation-verified:${invitationId}`,
         credential.user.uid
       )
-      const cleanUrl = new URL('/accept-invitation', window.location.origin)
+      const cleanUrl = new URL(`${import.meta.env.BASE_URL}accept-invitation`, window.location.origin)
       cleanUrl.searchParams.set('invitationId', invitationId!)
       window.history.replaceState({}, '', cleanUrl)
       setIsVerified(true)

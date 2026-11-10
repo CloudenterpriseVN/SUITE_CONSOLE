@@ -6,6 +6,9 @@ import { TanStackRouterVite } from '@tanstack/router-plugin/vite'
 
 // https://vite.dev/config/
 export default defineConfig({
+  // Console được phục vụ tại https://cloudenterprise.vn/console/ (Worker cev-gateway chuyển tiếp sang Pages),
+  // nên mọi asset phải nằm dưới /console/. Trên suite-console.pages.dev, public/_redirects ánh xạ ngược lại.
+  base: '/console/',
   plugins: [
     TanStackRouterVite({
       target: 'react',

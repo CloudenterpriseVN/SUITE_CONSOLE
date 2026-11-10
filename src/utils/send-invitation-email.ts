@@ -2,7 +2,7 @@ import { sendSignInLinkToEmail } from 'firebase/auth'
 import { auth } from '@/lib/firebase'
 
 export async function sendInvitationEmail(email: string, invitationId: string) {
-  const continueUrl = new URL('/accept-invitation', window.location.origin)
+  const continueUrl = new URL(`${import.meta.env.BASE_URL}accept-invitation`, window.location.origin)
   continueUrl.searchParams.set('invitationId', invitationId)
 
   await sendSignInLinkToEmail(auth, email, {

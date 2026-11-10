@@ -1,0 +1,3 @@
+# Console build với base /console/ (xem vite.config.ts). Trên suite-console.pages.dev không có tiền tố này,
+# nên ánh xạ /console/* về gốc để link cũ và asset vẫn chạy. Trên cloudenterprise.vn, Worker cev-gateway đã bỏ tiền tố.
+/console/* /:splat 200
