@@ -89,7 +89,23 @@ export interface AdminTeamDetail extends AdminTeamSummary {
   retention_days?: number | null
   /** Số ngày thực dụng (riêng hoặc mặc định) */
   retention_effective?: number
+  /** Server on-premise của team (Bước 33): app gọi `<api_root>/<app>/...`; null = cloud CEV */
+  api_root?: string | null
   subscriptions: AdminSubscription[]
+}
+
+/** Khoá của server on-premise; khoá rõ (`key`) chỉ trả MỘT lần lúc tạo. */
+export interface ServerKey {
+  id: string
+  team_id: string
+  name: string
+  key_prefix: string
+  status: 'active' | 'revoked'
+  created_by?: string
+  create_at?: string
+  revoked_by?: string
+  revoked_at?: string
+  key?: string
 }
 
 export interface AppOta {
@@ -252,6 +268,58 @@ export function useSetRetention() {
         reason: data.reason,
       }),
     onSuccess: () => invalidateAdmin(queryClient),
+  })
+}
+
+export function useSetApiRoot() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: {
+      teamId: string
+      api_root: string | null
+      reason?: string
+    }) =>
+      requestWithPatch<
+        { api_root: string | null; reason?: string },
+        AdminTeamDetail
+      >(`/admin/teams/${data.teamId}`, {
+        api_root: data.api_root,
+        reason: data.reason,
+      }),
+    onSuccess: () => invalidateAdmin(queryClient),
+  })
+}
+
+export function useServerKeys(teamId: string | null) {
+  return useQuery({
+    queryKey: ['admin-server-keys', teamId],
+    queryFn: () => request<ServerKey[]>(`/admin/teams/${teamId}/server-keys`),
+    enabled: !!teamId,
+  })
+}
+
+export function useCreateServerKey() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { teamId: string; name: string }) =>
+      requestWithPost<{ name: string }, ServerKey>(
+        `/admin/teams/${data.teamId}/server-keys`,
+        { name: data.name }
+      ),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['admin-server-keys'] }),
+  })
+}
+
+export function useRevokeServerKey() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { teamId: string; keyId: string }) =>
+      requestWithDelete<ServerKey>(
+        `/admin/teams/${data.teamId}/server-keys/${data.keyId}`
+      ),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['admin-server-keys'] }),
   })
 }
 

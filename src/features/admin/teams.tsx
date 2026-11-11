@@ -35,6 +35,7 @@ import {
 } from './components/status'
 import {
   CreateTeamDialog,
+  OnPremDialog,
   RetentionDialog,
   SubscribeForTeamDialog,
   TransferOwnerDialog,
@@ -231,6 +232,7 @@ function TeamSheet({
   const [transferring, setTransferring] = useState(false)
   const [subscribing, setSubscribing] = useState(false)
   const [retention, setRetention] = useState(false)
+  const [onPrem, setOnPrem] = useState(false)
   const { data: apps } = useAdminApps()
 
   const run = async (status: string, reason: string) => {
@@ -275,6 +277,18 @@ function TeamSheet({
                   variant='link'
                   className='h-auto px-2 py-0'
                   onClick={() => setRetention(true)}
+                >
+                  Sửa
+                </Button>
+              </dd>
+              <dt className='text-muted-foreground'>Máy chủ</dt>
+              <dd className='break-all'>
+                {team.api_root || 'Cloud CEV'}
+                <Button
+                  size='sm'
+                  variant='link'
+                  className='h-auto px-2 py-0'
+                  onClick={() => setOnPrem(true)}
                 >
                   Sửa
                 </Button>
@@ -371,6 +385,14 @@ function TeamSheet({
             current={team.retention_days}
             effective={team.retention_effective}
             onClose={() => setRetention(false)}
+          />
+        )}
+        {onPrem && team && (
+          <OnPremDialog
+            teamId={team.id}
+            teamName={team.name ?? team.id}
+            current={team.api_root}
+            onClose={() => setOnPrem(false)}
           />
         )}
         {subscribing && team && apps && (

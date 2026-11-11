@@ -4,7 +4,11 @@ import {
   type AdminApp,
   type NewTeam,
   SUGGESTED_STATUSES,
+  useCreateServerKey,
   useCreateTeam,
+  useRevokeServerKey,
+  useServerKeys,
+  useSetApiRoot,
   useSetRetention,
   useSubscribeForTeam,
   useTransferOwner,
@@ -266,6 +270,163 @@ export function RetentionDialog({
             }
           >
             Lưu
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  )
+}
+
+const isApiRoot = (v: string) => /^https?:\/\/[^\s/?#]+(\/[^\s?#]*)?$/.test(v)
+
+/** Server on-premise của team (Bước 33): địa chỉ API + khoá server dán vào `.env` của server. */
+export function OnPremDialog({
+  teamId,
+  teamName,
+  current,
+  onClose,
+}: {
+  teamId: string
+  teamName: string
+  current: string | null | undefined
+  onClose: () => void
+}) {
+  const setRoot = useSetApiRoot()
+  const { data: keys, isLoading } = useServerKeys(teamId)
+  const createKey = useCreateServerKey()
+  const revokeKey = useRevokeServerKey()
+  const [root, setRootText] = useState(current ?? '')
+  const [reason, setReason] = useState('')
+  const [keyName, setKeyName] = useState('')
+  const [created, setCreated] = useState<string | null>(null)
+  const value = root.trim().replace(/\/+$/, '') || null
+  const valid = value == null || isApiRoot(value)
+  const same = value === (current ?? null)
+
+  return (
+    <Dialog open onOpenChange={(o) => !o && onClose()}>
+      <DialogContent className='sm:max-w-lg'>
+        <DialogHeader>
+          <DialogTitle>Máy chủ riêng — {teamName}</DialogTitle>
+          <DialogDescription>
+            Team chạy Suite Shop, Suite WMS, Suite DMS trên máy chủ của mình.
+            Đăng nhập, gói dịch vụ và cập nhật ứng dụng vẫn ở cloud CEV. Để
+            trống địa chỉ để dùng cloud CEV.
+          </DialogDescription>
+        </DialogHeader>
+        <div className='grid gap-1.5'>
+          <Label htmlFor='api-root'>Địa chỉ máy chủ</Label>
+          <Input
+            id='api-root'
+            placeholder='https://suite.congty.vn'
+            value={root}
+            onChange={(e) => setRootText(e.target.value)}
+          />
+          {!valid && (
+            <p className='text-destructive text-xs'>
+              Cần dạng http(s)://tên-máy[/đường-dẫn], không có ? hoặc #.
+            </p>
+          )}
+        </div>
+        <Textarea
+          placeholder='Lý do (không bắt buộc)'
+          value={reason}
+          onChange={(e) => setReason(e.target.value)}
+        />
+        <div className='flex justify-end'>
+          <Button
+            size='sm'
+            disabled={!valid || same || setRoot.isPending}
+            onClick={() =>
+              attempt(
+                () => setRoot.mutateAsync({ teamId, api_root: value, reason }),
+                value ? `Team dùng máy chủ ${value}` : 'Team dùng cloud CEV',
+                () => setReason('')
+              )
+            }
+          >
+            Lưu địa chỉ
+          </Button>
+        </div>
+
+        <div className='space-y-2 border-t pt-4'>
+          <p className='font-medium'>Khoá máy chủ</p>
+          <p className='text-muted-foreground text-xs'>
+            Dán vào biến SUITE_SERVER_KEY của máy chủ. Khoá chỉ dùng được cho
+            team này và chỉ hiện một lần.
+          </p>
+          {created && (
+            <div className='rounded-md border border-amber-500/50 bg-amber-500/10 p-2'>
+              <p className='mb-1 text-xs'>Chép khoá ngay, sẽ không hiện lại:</p>
+              <code className='block font-mono text-xs break-all select-all'>
+                {created}
+              </code>
+            </div>
+          )}
+          {isLoading ? (
+            <p className='text-muted-foreground text-xs'>Đang tải…</p>
+          ) : (
+            (keys ?? []).map((k) => (
+              <div
+                key={k.id}
+                className='flex items-center gap-2 rounded-md border p-2 text-xs'
+              >
+                <span className='font-medium'>{k.name}</span>
+                <code className='text-muted-foreground'>{k.key_prefix}…</code>
+                <span className='text-muted-foreground'>
+                  {k.status === 'active' ? 'Đang dùng' : 'Đã thu hồi'}
+                </span>
+                {k.status === 'active' && (
+                  <Button
+                    size='sm'
+                    variant='link'
+                    className='text-destructive ml-auto h-auto p-0'
+                    disabled={revokeKey.isPending}
+                    onClick={() =>
+                      attempt(
+                        () => revokeKey.mutateAsync({ teamId, keyId: k.id }),
+                        `Đã thu hồi khoá ${k.name}`,
+                        () => setCreated(null)
+                      )
+                    }
+                  >
+                    Thu hồi
+                  </Button>
+                )}
+              </div>
+            ))
+          )}
+          <div className='flex gap-2'>
+            <Input
+              placeholder='Tên khoá, vd. Máy chủ văn phòng'
+              value={keyName}
+              onChange={(e) => setKeyName(e.target.value)}
+            />
+            <Button
+              size='sm'
+              variant='outline'
+              disabled={!keyName.trim() || createKey.isPending}
+              onClick={async () => {
+                try {
+                  const res = await createKey.mutateAsync({
+                    teamId,
+                    name: keyName.trim(),
+                  })
+                  setCreated(res.key ?? null)
+                  setKeyName('')
+                  toast.success('Đã tạo khoá máy chủ')
+                } catch (e) {
+                  toast.error((e as Error).message)
+                }
+              }}
+            >
+              Tạo khoá
+            </Button>
+          </div>
+        </div>
+        <DialogFooter>
+          <Button variant='outline' onClick={onClose}>
+            Đóng
           </Button>
         </DialogFooter>
       </DialogContent>
