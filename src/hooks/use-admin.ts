@@ -214,6 +214,22 @@ export function useSetSubscriptionStatus() {
   })
 }
 
+/** Xoá subscription chưa từng active, không còn thành viên (đăng ký nhầm). */
+export function useDeleteSubscription() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: { id: string; reason: string }) =>
+      requestWithDelete<{ id: string; deleted: boolean }>(
+        `/admin/subscriptions/${data.id}`,
+        {
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ reason: data.reason }),
+        }
+      ),
+    onSuccess: () => invalidateAdmin(queryClient),
+  })
+}
+
 export function useAdminTeams(filters: { q?: string; status?: string }) {
   const params = new URLSearchParams()
   if (filters.q) params.set('q', filters.q)

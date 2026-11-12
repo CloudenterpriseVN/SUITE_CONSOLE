@@ -4,6 +4,7 @@ import {
   type AdminSubscription,
   useAdminApps,
   useAdminSubscriptions,
+  useDeleteSubscription,
   useSetSubscriptionStatus,
 } from '@/hooks/use-admin'
 import { Button } from '@/components/ui/button'
@@ -37,6 +38,7 @@ export default function AdminSubscriptions() {
   const { data: rows, isLoading, error } = useAdminSubscriptions({ status, q })
   const { data: apps } = useAdminApps()
   const mutation = useSetSubscriptionStatus()
+  const remove = useDeleteSubscription()
   const [editing, setEditing] = useState<{
     sub: AdminSubscription
     status: string
@@ -192,6 +194,34 @@ export default function AdminSubscriptions() {
                       >
                         Đổi trạng thái
                       </Button>
+                      {sub.status !== 'active' && (
+                        <Button
+                          size='sm'
+                          variant='ghost'
+                          className='text-destructive'
+                          disabled={remove.isPending}
+                          title='Chỉ gói chưa từng kích hoạt và không còn thành viên. Xoá xong team không còn thấy app và đăng ký lại được.'
+                          onClick={async () => {
+                            const reason = window.prompt(
+                              `Xoá ${appName(sub.app_code)} của ${teamName(sub)}? Lý do:`
+                            )
+                            if (!reason?.trim()) return
+                            try {
+                              await remove.mutateAsync({
+                                id: sub.id,
+                                reason: reason.trim(),
+                              })
+                              toast.success(
+                                `Đã xoá ${appName(sub.app_code)} của ${teamName(sub)}`
+                              )
+                            } catch (e) {
+                              toast.error((e as Error).message)
+                            }
+                          }}
+                        >
+                          Xoá
+                        </Button>
+                      )}
                     </TableCell>
                   </TableRow>
                 ))

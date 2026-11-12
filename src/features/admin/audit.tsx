@@ -15,6 +15,7 @@ const ACTION_LABELS: Record<string, string> = {
   'subscription.status': 'Đổi trạng thái subscription',
   'subscription.create': 'Đăng ký dịch vụ hộ',
   'subscription.ota': 'Ghim phiên bản OTA',
+  'subscription.delete': 'Xoá subscription (chưa từng dùng)',
   'team.create': 'Tạo team',
   'team.transfer_owner': 'Chuyển chủ team',
   'app.update': 'Sửa ứng dụng',
