@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { useAppSubscriptionStatus } from '@/hooks/use-app-subscription'
 import { useAppPricing } from '@/hooks/use-app-subscription'
 import { useActiveTeam } from '@/hooks/use-team'
+import { useIsSuperadmin } from '@/hooks/use-admin'
 import { Loader2 } from 'lucide-react'
 import { toast } from 'sonner'
 
@@ -31,8 +32,9 @@ export function AppSubscriptionCard({
   const { isSubscribed, subscription } = useAppSubscriptionStatus(appId)
   const { data: activeTeam, isOwner, role } = useActiveTeam()
 
-  // Chỉ owner mới được đăng ký app
-  const canSubscribe = isOwner
+  // Tạm khóa tự đăng ký (2026-11-12): chỉ superadmin đăng ký app cho team, khách liên hệ CEV.
+  const isSuperadmin = useIsSuperadmin()
+  const canSubscribe = isOwner && isSuperadmin
   // Chỉ owner hoặc admin mới được truy cập app
   const canAccess = role === 'owner' || role === 'admin'
 
@@ -130,9 +132,16 @@ export function AppSubscriptionCard({
             )}
           </Button>
         ) : (
-          <p className="text-sm text-muted-foreground italic">
-            Không có quyền đăng ký ứng dụng cho team này
-          </p>
+          <div className="space-y-1">
+            <Button size="sm" className="w-full" disabled>
+              Đăng ký ngay
+            </Button>
+            <p className="text-sm text-muted-foreground italic">
+              {isOwner
+                ? 'Liên hệ CEV để đăng ký ứng dụng cho team này'
+                : 'Không có quyền đăng ký ứng dụng cho team này'}
+            </p>
+          </div>
         )}
       </CardContent>
     </Card>

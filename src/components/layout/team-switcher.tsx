@@ -20,6 +20,7 @@ import { useAtom } from 'jotai'
 import { activeTeamIdAtom } from '@/stores/applicationStore'
 import { useTeams, useCreateTeam, useUpdateTeam } from '@/hooks/use-team'
 import { useInvitations } from '@/hooks/use-invitations'
+import { useIsSuperadmin } from '@/hooks/use-admin'
 import { TeamDialog } from '@/components/team-dialog'
 import type { Team } from '@/types/team'
 import { toast } from 'sonner'
@@ -31,6 +32,8 @@ export function TeamSwitcher() {
   const [activeTeamId, setActiveTeamId] = useAtom(activeTeamIdAtom)
 
   const createTeam = useCreateTeam()
+  // Tạm khóa tự tạo team (2026-11-12): chỉ superadmin tạo, khách liên hệ CEV.
+  const canCreateTeam = useIsSuperadmin()
   const updateTeam = useUpdateTeam()
 
   const [dialogOpen, setDialogOpen] = useState(false)
@@ -134,6 +137,7 @@ export function TeamSwitcher() {
             <SidebarMenuButton
               size='lg'
               onClick={handleAddTeam}
+              disabled={!canCreateTeam}
               className='border-2 border-dashed border-primary/50 hover:border-primary hover:bg-primary/5'
             >
               <div className='bg-primary/10 text-primary flex aspect-square size-8 items-center justify-center rounded-lg'>
@@ -141,7 +145,9 @@ export function TeamSwitcher() {
               </div>
               <div className='grid flex-1 text-left text-sm leading-tight'>
                 <span className='truncate font-semibold'>Tạo Team</span>
-                <span className='truncate text-xs text-muted-foreground'>Bắt đầu sử dụng</span>
+                <span className='truncate text-xs text-muted-foreground'>
+                  {canCreateTeam ? 'Bắt đầu sử dụng' : 'Liên hệ CEV để được tạo team'}
+                </span>
               </div>
               <Plus className='ml-auto size-4 text-primary' />
             </SidebarMenuButton>
@@ -241,11 +247,20 @@ export function TeamSwitcher() {
               )}
 
               <DropdownMenuSeparator />
-              <DropdownMenuItem onClick={handleAddTeam} className='gap-2 p-2'>
+              <DropdownMenuItem
+                onClick={handleAddTeam}
+                disabled={!canCreateTeam}
+                className='gap-2 p-2'
+              >
                 <div className='bg-background flex size-6 items-center justify-center rounded-md border'>
                   <Plus className='size-4' />
                 </div>
-                <div className='font-medium'>Thêm team mới</div>
+                <div className='grid'>
+                  <span className='font-medium'>Thêm team mới</span>
+                  {!canCreateTeam && (
+                    <span className='text-xs text-muted-foreground'>Liên hệ CEV để được tạo team</span>
+                  )}
+                </div>
               </DropdownMenuItem>
             </DropdownMenuContent>
           </DropdownMenu>
