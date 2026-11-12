@@ -12,6 +12,7 @@ const TABS = [
   { to: '/admin', label: 'Teams' },
   { to: '/admin/subscriptions', label: 'Subscriptions' },
   { to: '/admin/apps', label: 'Apps / OTA' },
+  { to: '/admin/servers', label: 'Máy chủ' },
   { to: '/admin/audit', label: 'Nhật ký' },
 ] as const
 

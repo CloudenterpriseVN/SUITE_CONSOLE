@@ -41,6 +41,7 @@ import { Route as ClerkauthSignUpRouteImport } from './routes/clerk/(auth)/sign-
 import { Route as ClerkauthSignInRouteImport } from './routes/clerk/(auth)/sign-in'
 import { Route as AuthenticatedTeamMembersRouteImport } from './routes/_authenticated/team/members'
 import { Route as AuthenticatedAdminSubscriptionsRouteImport } from './routes/_authenticated/admin/subscriptions'
+import { Route as AuthenticatedAdminServersRouteImport } from './routes/_authenticated/admin/servers'
 import { Route as AuthenticatedAdminAuditRouteImport } from './routes/_authenticated/admin/audit'
 import { Route as AuthenticatedAdminAppsRouteImport } from './routes/_authenticated/admin/apps'
 
@@ -210,6 +211,12 @@ const AuthenticatedAdminSubscriptionsRoute =
     path: '/admin/subscriptions',
     getParentRoute: () => AuthenticatedRouteRoute,
   } as any)
+const AuthenticatedAdminServersRoute =
+  AuthenticatedAdminServersRouteImport.update({
+    id: '/admin/servers',
+    path: '/admin/servers',
+    getParentRoute: () => AuthenticatedRouteRoute,
+  } as any)
 const AuthenticatedAdminAuditRoute = AuthenticatedAdminAuditRouteImport.update({
   id: '/admin/audit',
   path: '/admin/audit',
@@ -239,6 +246,7 @@ export interface FileRoutesByFullPath {
   '/': typeof AuthenticatedIndexRoute
   '/admin/apps': typeof AuthenticatedAdminAppsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/servers': typeof AuthenticatedAdminServersRoute
   '/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
   '/team/members': typeof AuthenticatedTeamMembersRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
@@ -271,6 +279,7 @@ export interface FileRoutesByTo {
   '/': typeof AuthenticatedIndexRoute
   '/admin/apps': typeof AuthenticatedAdminAppsRoute
   '/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/admin/servers': typeof AuthenticatedAdminServersRoute
   '/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
   '/team/members': typeof AuthenticatedTeamMembersRoute
   '/clerk/sign-in': typeof ClerkauthSignInRoute
@@ -308,6 +317,7 @@ export interface FileRoutesById {
   '/_authenticated/': typeof AuthenticatedIndexRoute
   '/_authenticated/admin/apps': typeof AuthenticatedAdminAppsRoute
   '/_authenticated/admin/audit': typeof AuthenticatedAdminAuditRoute
+  '/_authenticated/admin/servers': typeof AuthenticatedAdminServersRoute
   '/_authenticated/admin/subscriptions': typeof AuthenticatedAdminSubscriptionsRoute
   '/_authenticated/team/members': typeof AuthenticatedTeamMembersRoute
   '/clerk/(auth)/sign-in': typeof ClerkauthSignInRoute
@@ -344,6 +354,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/apps'
     | '/admin/audit'
+    | '/admin/servers'
     | '/admin/subscriptions'
     | '/team/members'
     | '/clerk/sign-in'
@@ -376,6 +387,7 @@ export interface FileRouteTypes {
     | '/'
     | '/admin/apps'
     | '/admin/audit'
+    | '/admin/servers'
     | '/admin/subscriptions'
     | '/team/members'
     | '/clerk/sign-in'
@@ -412,6 +424,7 @@ export interface FileRouteTypes {
     | '/_authenticated/'
     | '/_authenticated/admin/apps'
     | '/_authenticated/admin/audit'
+    | '/_authenticated/admin/servers'
     | '/_authenticated/admin/subscriptions'
     | '/_authenticated/team/members'
     | '/clerk/(auth)/sign-in'
@@ -671,6 +684,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedAdminSubscriptionsRouteImport
       parentRoute: typeof AuthenticatedRouteRoute
     }
+    '/_authenticated/admin/servers': {
+      id: '/_authenticated/admin/servers'
+      path: '/admin/servers'
+      fullPath: '/admin/servers'
+      preLoaderRoute: typeof AuthenticatedAdminServersRouteImport
+      parentRoute: typeof AuthenticatedRouteRoute
+    }
     '/_authenticated/admin/audit': {
       id: '/_authenticated/admin/audit'
       path: '/admin/audit'
@@ -707,6 +727,7 @@ interface AuthenticatedRouteRouteChildren {
   AuthenticatedIndexRoute: typeof AuthenticatedIndexRoute
   AuthenticatedAdminAppsRoute: typeof AuthenticatedAdminAppsRoute
   AuthenticatedAdminAuditRoute: typeof AuthenticatedAdminAuditRoute
+  AuthenticatedAdminServersRoute: typeof AuthenticatedAdminServersRoute
   AuthenticatedAdminSubscriptionsRoute: typeof AuthenticatedAdminSubscriptionsRoute
   AuthenticatedTeamMembersRoute: typeof AuthenticatedTeamMembersRoute
   AuthenticatedAdminIndexRoute: typeof AuthenticatedAdminIndexRoute
@@ -725,6 +746,7 @@ const AuthenticatedRouteRouteChildren: AuthenticatedRouteRouteChildren = {
   AuthenticatedIndexRoute: AuthenticatedIndexRoute,
   AuthenticatedAdminAppsRoute: AuthenticatedAdminAppsRoute,
   AuthenticatedAdminAuditRoute: AuthenticatedAdminAuditRoute,
+  AuthenticatedAdminServersRoute: AuthenticatedAdminServersRoute,
   AuthenticatedAdminSubscriptionsRoute: AuthenticatedAdminSubscriptionsRoute,
   AuthenticatedTeamMembersRoute: AuthenticatedTeamMembersRoute,
   AuthenticatedAdminIndexRoute: AuthenticatedAdminIndexRoute,

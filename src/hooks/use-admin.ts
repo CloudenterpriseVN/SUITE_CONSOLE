@@ -89,15 +89,27 @@ export interface AdminTeamDetail extends AdminTeamSummary {
   retention_days?: number | null
   /** Số ngày thực dụng (riêng hoặc mặc định) */
   retention_effective?: number
-  /** Server on-premise của team (Bước 33): app gọi `<api_root>/<app>/...`; null = cloud CEV */
+  /** Server on-premise của team (Bước 35); null = cloud CEV */
+  server_id?: string | null
+  /** Bản sao địa chỉ của server: app gọi `<api_root>/<app>/...` */
   api_root?: string | null
   subscriptions: AdminSubscription[]
+}
+
+/** Server on-premise (Bước 35): phục vụ mọi team superadmin gán vào. */
+export interface OnpremServer {
+  id: string
+  name: string
+  api_root: string
+  created_by?: string
+  create_at?: string
+  teams?: { id: string; name?: string }[]
 }
 
 /** Khoá của server on-premise; khoá rõ (`key`) chỉ trả MỘT lần lúc tạo. */
 export interface ServerKey {
   id: string
-  team_id: string
+  server_id: string
   name: string
   key_prefix: string
   status: 'active' | 'revoked'
@@ -271,39 +283,89 @@ export function useSetRetention() {
   })
 }
 
-export function useSetApiRoot() {
+export function useSetTeamServer() {
   const queryClient = useQueryClient()
   return useMutation({
     mutationFn: (data: {
       teamId: string
-      api_root: string | null
+      server_id: string | null
       reason?: string
     }) =>
       requestWithPatch<
-        { api_root: string | null; reason?: string },
+        { server_id: string | null; reason?: string },
         AdminTeamDetail
       >(`/admin/teams/${data.teamId}`, {
-        api_root: data.api_root,
+        server_id: data.server_id,
         reason: data.reason,
       }),
-    onSuccess: () => invalidateAdmin(queryClient),
+    onSuccess: () => {
+      invalidateAdmin(queryClient)
+      queryClient.invalidateQueries({ queryKey: ['admin-servers'] })
+    },
   })
 }
 
-export function useServerKeys(teamId: string | null) {
+export function useOnpremServers() {
   return useQuery({
-    queryKey: ['admin-server-keys', teamId],
-    queryFn: () => request<ServerKey[]>(`/admin/teams/${teamId}/server-keys`),
-    enabled: !!teamId,
+    queryKey: ['admin-servers'],
+    queryFn: () => request<OnpremServer[]>('/admin/onprem-servers'),
+  })
+}
+
+export function useSaveServer() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (data: {
+      id?: string
+      name: string
+      api_root: string
+      reason?: string
+    }) =>
+      data.id
+        ? requestWithPatch<
+            { name: string; api_root: string; reason?: string },
+            OnpremServer
+          >(`/admin/onprem-servers/${data.id}`, {
+            name: data.name,
+            api_root: data.api_root,
+            reason: data.reason,
+          })
+        : requestWithPost<{ name: string; api_root: string }, OnpremServer>(
+            '/admin/onprem-servers',
+            { name: data.name, api_root: data.api_root }
+          ),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin-servers'] })
+      invalidateAdmin(queryClient)
+    },
+  })
+}
+
+export function useDeleteServer() {
+  const queryClient = useQueryClient()
+  return useMutation({
+    mutationFn: (id: string) =>
+      requestWithDelete<OnpremServer>(`/admin/onprem-servers/${id}`),
+    onSuccess: () =>
+      queryClient.invalidateQueries({ queryKey: ['admin-servers'] }),
+  })
+}
+
+export function useServerKeys(serverId: string | null) {
+  return useQuery({
+    queryKey: ['admin-server-keys', serverId],
+    queryFn: () =>
+      request<ServerKey[]>(`/admin/onprem-servers/${serverId}/keys`),
+    enabled: !!serverId,
   })
 }
 
 export function useCreateServerKey() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: { teamId: string; name: string }) =>
+    mutationFn: (data: { serverId: string; name: string }) =>
       requestWithPost<{ name: string }, ServerKey>(
-        `/admin/teams/${data.teamId}/server-keys`,
+        `/admin/onprem-servers/${data.serverId}/keys`,
         { name: data.name }
       ),
     onSuccess: () =>
@@ -314,9 +376,9 @@ export function useCreateServerKey() {
 export function useRevokeServerKey() {
   const queryClient = useQueryClient()
   return useMutation({
-    mutationFn: (data: { teamId: string; keyId: string }) =>
+    mutationFn: (data: { serverId: string; keyId: string }) =>
       requestWithDelete<ServerKey>(
-        `/admin/teams/${data.teamId}/server-keys/${data.keyId}`
+        `/admin/onprem-servers/${data.serverId}/keys/${data.keyId}`
       ),
     onSuccess: () =>
       queryClient.invalidateQueries({ queryKey: ['admin-server-keys'] }),

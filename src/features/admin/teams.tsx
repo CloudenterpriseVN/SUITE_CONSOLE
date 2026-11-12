@@ -391,7 +391,7 @@ function TeamSheet({
           <OnPremDialog
             teamId={team.id}
             teamName={team.name ?? team.id}
-            current={team.api_root}
+            current={team.server_id}
             onClose={() => setOnPrem(false)}
           />
         )}

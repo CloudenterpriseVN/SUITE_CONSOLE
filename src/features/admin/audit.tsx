@@ -21,6 +21,12 @@ const ACTION_LABELS: Record<string, string> = {
   'app.default_ota': 'Đặt OTA mặc định',
   'app_version.create': 'Thêm phiên bản OTA',
   'app_version.delete': 'Xoá phiên bản OTA',
+  'team.server': 'Đổi máy chủ của team',
+  'server.create': 'Thêm máy chủ',
+  'server.update': 'Sửa máy chủ',
+  'server.delete': 'Xoá máy chủ',
+  'server_key.create': 'Tạo khoá máy chủ',
+  'server_key.revoke': 'Thu hồi khoá máy chủ',
 }
 
 const show = (v: unknown) =>
