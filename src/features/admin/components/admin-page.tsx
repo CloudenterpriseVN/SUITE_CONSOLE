@@ -13,6 +13,7 @@ const TABS = [
   { to: '/admin/subscriptions', label: 'Subscriptions' },
   { to: '/admin/apps', label: 'Apps / OTA' },
   { to: '/admin/servers', label: 'Máy chủ' },
+  { to: '/admin/infra-cost', label: 'Chi phí hạ tầng' },
   { to: '/admin/audit', label: 'Nhật ký' },
 ] as const
 

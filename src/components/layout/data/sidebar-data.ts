@@ -5,6 +5,7 @@ import {
   IconHistory,
   IconKey,
   IconPackages,
+  IconReportMoney,
   IconShieldCheck,
   IconUsersGroup,
   IconUserCog,
@@ -18,6 +19,7 @@ export const adminNavGroup: NavGroup = {
     { title: 'Teams', url: '/admin', icon: IconUsersGroup },
     { title: 'Subscriptions', url: '/admin/subscriptions', icon: IconShieldCheck },
     { title: 'Apps / OTA', url: '/admin/apps', icon: IconApps },
+    { title: 'Chi phí hạ tầng', url: '/admin/infra-cost', icon: IconReportMoney },
     { title: 'Nhật ký', url: '/admin/audit', icon: IconHistory },
   ],
 }
