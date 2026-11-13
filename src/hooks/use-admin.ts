@@ -416,7 +416,7 @@ export function useSubscribeForTeam() {
 export function useAdminApps() {
   return useQuery({
     queryKey: ['admin-apps'],
-    queryFn: () => request<AdminApp[]>('/apps'),
+    queryFn: () => request<AdminApp[]>('/apps?components=1'),
   })
 }
 
